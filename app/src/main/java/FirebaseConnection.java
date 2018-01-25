@@ -12,11 +12,15 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-public class FirebaseConnection {
+public class FirebaseConnection{
     private StorageReference storageRef;
     private String user;
     private String path;
+    private ArrayList<String> allDir;
+    private ArrayList<String> userDir;
 
     FirebaseConnection(String user, String path){
         storageRef = FirebaseStorage.getInstance().getReference();
@@ -24,9 +28,21 @@ public class FirebaseConnection {
         this.path = path;
     }
 
+
+    public ArrayList<String> listDirectory(){
+        allDir =(ArrayList<String>)Arrays.asList(new File(storageRef.getPath()).list());
+        return allDir;
+    }
+
+    public ArrayList<String> listUserDirectory(String user){
+        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()+"/"+user).list());
+        return userDir;
+    }
+
+
     public boolean upload(String img){
         Uri file = Uri.fromFile(new File(img));
-        StorageReference imgRef = storageRef.child(user+"/@");
+        StorageReference imgRef = storageRef.child(user);
 
         imgRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -46,10 +62,11 @@ public class FirebaseConnection {
         return true;
     }
 
-    public boolean download(StorageReference imgRef){
+    public boolean download(StorageReference imgRef, String fileName){
         File localFile = null;
+        String[] split = fileName.split(".");
         try {
-            localFile = File.createTempFile("images", "jpg");
+            localFile = File.createTempFile(split[0],split[1]);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
