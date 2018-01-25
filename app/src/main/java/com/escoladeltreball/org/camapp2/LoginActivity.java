@@ -13,6 +13,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button signUp;
     private EditText username;
     private EditText password;
+    private String userEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,19 +30,23 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-
     private void attempLogin() {
-        String user = "damedt";
-        String pass = "damedt";
+        userEmail = username.getText()+"";
+        String pass = password.getText()+"";
 
 
-
-            if (username.getText().toString().equals(user)&&password.getText().toString().equals(pass)){
-                Intent intent = new Intent(this,CameraLauncher.class);
-                startActivity(intent);
-                //userLogin = user;
-            }else {
-            Toast.makeText(this,"User not registered",Toast.LENGTH_LONG).show();
+        if (!userEmail.contains("@")){
+            Toast.makeText(this,"Username should be an email", Toast.LENGTH_LONG).show();
+        }else {
+            Toast.makeText(this, "Signed In", Toast.LENGTH_LONG);
         }
+
+//            if (username.getText().toString().equals(user)&&password.getText().toString().equals(pass)){
+//                Intent intent = new Intent(this,CameraLauncher.class);
+//                startActivity(intent);
+//                //userLogin = user;
+//            }else {
+//            Toast.makeText(this,"User not registered",Toast.LENGTH_LONG).show();
+//        }
     }
 }

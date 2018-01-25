@@ -17,7 +17,8 @@
         <activity
             android:name=".CameraLauncher"
             android:label="@string/title_activity_camera_launcher"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".NewUser"></activity>
     </application>
 
 </manifest>
