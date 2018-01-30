@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.escoladeltreball.org.camapp2.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -18,14 +19,13 @@ import java.util.Arrays;
 public class FirebaseConnection{
     private StorageReference storageRef;
     private String user;
-    private String path;
     private ArrayList<String> allDir;
     private ArrayList<String> userDir;
 
-    FirebaseConnection(String user, String path){
+
+    FirebaseConnection(String user){
         storageRef = FirebaseStorage.getInstance().getReference();
         this.user = user;
-        this.path = path;
     }
 
 
@@ -86,5 +86,45 @@ public class FirebaseConnection{
             }
         });
         return true;
+    }
+
+    //GETTERS & SETTERS//
+
+
+    public StorageReference getStorageRef() {
+        return storageRef;
+    }
+
+    public void setStorageRef(StorageReference storageRef) {
+        this.storageRef = storageRef;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public ArrayList<String> getAllDir() {
+        return allDir;
+    }
+
+    public void setAllDir(ArrayList<String> allDir) {
+        this.allDir = allDir;
+    }
+
+    public ArrayList<String> getUserDir() {
+        return userDir;
+    }
+
+    public void setUserDir(ArrayList<String> userDir) {
+        this.userDir = userDir;
+    }
+
+    public static void main(String[] args) {
+        FirebaseConnection firebaseConnection = new FirebaseConnection("lpbove@gmail.com");
+        firebaseConnection.upload("testIMG.png");
     }
 }
