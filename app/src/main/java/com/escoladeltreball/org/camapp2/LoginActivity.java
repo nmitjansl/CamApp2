@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends CameraLauncher {
 
     private Button signIn;
     private Button signUp;
@@ -27,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
         password = (EditText) findViewById(R.id.password);
 
         signIn.setOnClickListener(v -> attempLogin());
+        signUp.setOnClickListener(v -> attempLogin());
 
     }
 
@@ -39,6 +40,9 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this,"Username should be an email", Toast.LENGTH_LONG).show();
         }else {
             Toast.makeText(this, "Signed In", Toast.LENGTH_LONG);
+            setUserLogin(userEmail);
+            config.setProperty("user", userEmail);
+            guardarConfig();
         }
 
 //            if (username.getText().toString().equals(user)&&password.getText().toString().equals(pass)){
