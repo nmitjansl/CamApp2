@@ -1,12 +1,9 @@
 package com.escoladeltreball.org.camapp2;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Base64;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -15,7 +12,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -30,10 +26,10 @@ public class MainActivity extends AppCompatActivity {
         storageRef = FirebaseStorage.getInstance().getReference();
     }
 
-    public boolean upload(String img){
+    public boolean upload(String img) {
         String user = "";
         Uri file = Uri.fromFile(new File(img));
-        StorageReference imgRef = storageRef.child(user+"/@");
+        StorageReference imgRef = storageRef.child(user + "/@");
 
         imgRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -53,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public boolean download(StorageReference imgRef){
+    public boolean download(StorageReference imgRef) {
         File localFile = null;
         try {
             localFile = File.createTempFile("images", "jpg");
@@ -77,4 +73,6 @@ public class MainActivity extends AppCompatActivity {
         });
         return true;
     }
+
+
 }
