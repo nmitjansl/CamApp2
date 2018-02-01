@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1033662647187-jd772l68j6fhbrut0ekbpgupiqb3v38m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.escoladeltreball.org.camapp2",
+            "certificate_hash": "1cfcd1ddca4e03e015f15a75695a10903d079ae0"
+          }
+        },
+        {
           "client_id": "1033662647187-sjc1qsd27e6mucbr7b7nvgqlgkv72hhp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

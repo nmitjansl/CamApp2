@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -43,12 +45,10 @@ public class FirebaseConnection {
     public FirebaseConnection() {
     }
 
-    FirebaseConnection(String user, String path) {
-        storageRef = FirebaseStorage.getInstance().getReference();
+    FirebaseConnection(String user, StorageReference storageRef) {
+        this.storageRef = storageRef;
         this.user = user;
-        this.path = path;
     }
-
 
     /**
      * Registra usuarios con el método de autentificación de firebase, el password tiene que tener un mínimo
@@ -95,7 +95,7 @@ public class FirebaseConnection {
      * Comprueba si el usuario está registrado, devuelve un booleano indicando si existe o no
      */
 
-    private boolean signIn(String email, String password, final Context context) {
+    public boolean signIn(String email, String password, final Context context) {
         Log.d(TAG, "signIn:" + email);
         final boolean[] resultado = {false};
 
@@ -126,21 +126,31 @@ public class FirebaseConnection {
         return resultado[0];
     }
 
-
-    public ArrayList<String> listDirectory() {
-        allDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()).list());
+    public ArrayList<String> listDirectory(){
+        allDir =(ArrayList<String>)Arrays.asList(new File(storageRef.getPath()).list());
         return allDir;
     }
 
-    public ArrayList<String> listUserDirectory(String user) {
-        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath() + "/" + user).list());
+    public ArrayList<String> listUserDirectory(String user){
+        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()+"/"+user).list());
         return userDir;
     }
 
 
-    public boolean upload(String img) {
+    public void insertUserDB(String email, String uid, String pass){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+
+        myRef.setValue("Hello, World!");
+    }
+
+    public boolean upload(String img){
         Uri file = Uri.fromFile(new File(img));
-        StorageReference imgRef = storageRef.child(user);
+        if(img.contains("/")){
+            img = img.substring(img.lastIndexOf("/")+1);
+        }
+        StorageReference imgRef = storageRef.child(user+"/"+img);
+
 
         imgRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -160,11 +170,11 @@ public class FirebaseConnection {
         return true;
     }
 
-    public boolean download(StorageReference imgRef, String fileName) {
+    public boolean download(StorageReference imgRef, String fileName){
         File localFile = null;
         String[] split = fileName.split(".");
         try {
-            localFile = File.createTempFile(split[0], split[1]);
+            localFile = File.createTempFile(split[0],split[1]);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
