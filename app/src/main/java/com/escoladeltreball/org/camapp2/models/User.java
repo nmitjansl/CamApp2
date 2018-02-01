@@ -5,21 +5,22 @@ package com.escoladeltreball.org.camapp2.models;
  */
 
 public class User {
+    private String name;
     private String email;
     private String uid;
     private String pass;
 
-    public User(){
-        
+    public User() {
+
     }
 
-    public User(String email, String uid, String pass) {
+    public User(String name, String email, String uid, String pass) {
+        this.name = name;
         this.email = email;
         this.uid = uid;
         this.pass = pass;
     }
-
-    //GETTERS & SETTERS//
+//GETTERS & SETTERS//
 
     public String getEmail() {
         return email;
@@ -44,4 +45,8 @@ public class User {
     public void setPass(String pass) {
         this.pass = pass;
     }
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; }
 }
