@@ -21,5 +21,7 @@ public class NewUser extends AppCompatActivity {
         newUser = (EditText) findViewById(R.id.newUserName);
         newPassword = (EditText) findViewById(R.id.newPassword);
         createNewUser = (Button) findViewById(R.id.buttonCreateUser);
+
+
     }
 }
