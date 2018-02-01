@@ -18,8 +18,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -131,13 +133,13 @@ public class FirebaseConnection {
         return resultado[0];
     }
 
-    public ArrayList<String> listDirectory() {
-        allDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()).list());
+    public ArrayList<String> listDirectory(){
+        allDir =(ArrayList<String>)Arrays.asList(new File(storageRef.getPath()).list());
         return allDir;
     }
 
-    public ArrayList<String> listUserDirectory(String user) {
-        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath() + "/" + user).list());
+    public ArrayList<String> listUserDirectory(String user){
+        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()+"/"+user).list());
         return userDir;
     }
 
@@ -149,12 +151,21 @@ public class FirebaseConnection {
         myRef.setValue(user);
     }
 
-    public boolean upload(String img) {
+    public ArrayList<User> listUsers(){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference().child("users"+"/"+"users_data");
+        Query queryRef = myRef.endAt(null);
+        //TODO
+        //DataSnapshot dataSnapshot =
+        return null;
+    }
+
+    public boolean upload(String img){
         Uri file = Uri.fromFile(new File(img));
-        if (img.contains("/")) {
-            img = img.substring(img.lastIndexOf("/") + 1);
+        if(img.contains("/")){
+            img = img.substring(img.lastIndexOf("/")+1);
         }
-        StorageReference imgRef = storageRef.child(user + "/" + img);
+        StorageReference imgRef = storageRef.child(user+"/"+img);
 
 
         imgRef.putFile(file)
@@ -175,11 +186,11 @@ public class FirebaseConnection {
         return true;
     }
 
-    public boolean download(StorageReference imgRef, String fileName) {
+    public boolean download(StorageReference imgRef, String fileName){
         File localFile = null;
         String[] split = fileName.split(".");
         try {
-            localFile = File.createTempFile(split[0], split[1]);
+            localFile = File.createTempFile(split[0],split[1]);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
