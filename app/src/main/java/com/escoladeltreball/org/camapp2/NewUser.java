@@ -7,6 +7,7 @@ import android.widget.EditText;
 
 public class NewUser extends AppCompatActivity {
 
+    private EditText newName;
     private EditText newUser;
     private EditText newPassword;
     private Button createNewUser;
@@ -16,5 +17,9 @@ public class NewUser extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_user);
 
+        newName = (EditText) findViewById(R.id.newName);
+        newUser = (EditText) findViewById(R.id.newUserName);
+        newPassword = (EditText) findViewById(R.id.newPassword);
+        createNewUser = (Button) findViewById(R.id.buttonCreateUser);
     }
 }

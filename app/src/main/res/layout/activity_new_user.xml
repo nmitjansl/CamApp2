@@ -4,57 +4,87 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.escoladeltreball.org.camapp2.NewUser">
+    tools:context="com.escoladeltreball.org.camapp2.NewUser"
+    tools:layout_editor_absoluteY="81dp">
+
+    <EditText
+        android:id="@+id/newName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="111dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="16dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_marginBottom="19dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:text="Name"
+        app:layout_constraintBottom_toTopOf="@+id/newUserName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/newName"
+        android:layout_marginLeft="16dp" />
 
     <EditText
         android:id="@+id/newUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="19dp"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/newName"
+        android:layout_marginRight="16dp" />
 
     <EditText
         android:id="@+id/newPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="1dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="26dp"
         android:ems="10"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="@+id/newUserName"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newUserName"
-        android:layout_marginRight="1dp" />
+        android:layout_marginRight="16dp" />
 
     <Button
-        android:id="@+id/createUser"
+        android:id="@+id/buttonCreateUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="37dp"
-        android:layout_marginTop="23dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="27dp"
         android:text="Create User"
-        app:layout_constraintEnd_toEndOf="@+id/newPassword"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/newPassword"
-        android:layout_marginRight="37dp" />
+        android:layout_marginLeft="26dp" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="82dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="16dp"
         android:text="New Username"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/newUserName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginLeft="16dp" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="27dp"
+        android:layout_marginStart="16dp"
         android:text="New Password"
-        app:layout_constraintBottom_toTopOf="@+id/newPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/buttonCreateUser"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginLeft="16dp" />
 </android.support.constraint.ConstraintLayout>
