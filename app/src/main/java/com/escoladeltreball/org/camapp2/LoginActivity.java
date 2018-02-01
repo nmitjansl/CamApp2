@@ -1,11 +1,15 @@
 package com.escoladeltreball.org.camapp2;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.escoladeltreball.org.camapp2.api.firebase.FirebaseConnection;
 
 public class LoginActivity extends CameraLauncher {
 
@@ -27,7 +31,7 @@ public class LoginActivity extends CameraLauncher {
         password = (EditText) findViewById(R.id.password);
 
         signIn.setOnClickListener(v -> attempLogin());
-        signUp.setOnClickListener(v -> attempLogin());
+        signUp.setOnClickListener(v -> attempSignUp());
 
     }
 
@@ -36,9 +40,12 @@ public class LoginActivity extends CameraLauncher {
         String pass = password.getText()+"";
 
 
-        if (!userEmail.contains("@")){
-            Toast.makeText(this,"Username should be an email", Toast.LENGTH_LONG).show();
-        }else {
+        if (!userEmail.contains("@") || pass.length() < 6){
+            Toast toast = Toast.makeText(this,"Email or password are invalid", Toast.LENGTH_LONG);
+            TextView v = toast.getView().findViewById(android.R.id.message);
+            v.setTextColor(Color.RED);
+            toast.show();
+        } else {
             Toast.makeText(this, "Signed In", Toast.LENGTH_LONG);
             setUserLogin(userEmail);
             config.setProperty("user", userEmail);
@@ -52,5 +59,23 @@ public class LoginActivity extends CameraLauncher {
 //            }else {
 //            Toast.makeText(this,"User not registered",Toast.LENGTH_LONG).show();
 //        }
+    }
+
+    private void attempSignUp() {
+        userEmail = username.getText()+"";
+        String pass = password.getText()+"";
+
+
+        if (!userEmail.contains("@") || pass.length() < 6){
+            Toast toast = Toast.makeText(this,"Email or password are invalid", Toast.LENGTH_LONG);
+            TextView v = toast.getView().findViewById(android.R.id.message);
+            v.setTextColor(Color.RED);
+            toast.show();
+        } else if (firebaseConnection.createUser(userEmail, pass, getApplicationContext())){
+            Toast.makeText(this, "Signed In", Toast.LENGTH_LONG);
+            setUserLogin(userEmail);
+            config.setProperty("user", userEmail);
+            guardarConfig();
+        }
     }
 }
