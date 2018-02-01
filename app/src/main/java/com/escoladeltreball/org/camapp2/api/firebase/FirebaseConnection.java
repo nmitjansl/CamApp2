@@ -16,7 +16,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -31,7 +30,6 @@ import java.util.Arrays;
 public class FirebaseConnection {
     @VisibleForTesting
     public ProgressDialog mProgressDialog;
-    private FirebaseUser userFireBase;
     private static final String TAG = "EmailPassword";
     private FirebaseAuth mAuth;
     private StorageReference storageRef;
@@ -67,7 +65,9 @@ public class FirebaseConnection {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success");
-                    userFireBase = mAuth.getCurrentUser();
+                    /*FirebaseUser userFireBase = mAuth.getCurrentUser();
+                    String userEmail = userFireBase.getEmail();
+                    String userUid = userFireBase.getUid();*/
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -86,6 +86,7 @@ public class FirebaseConnection {
     private boolean signIn(String email, String password, final Context context) {
         Log.d(TAG, "signIn:" + email);
         final boolean[] resultado = {false};
+
 
         // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
@@ -172,6 +173,8 @@ public class FirebaseConnection {
         });
         return true;
     }
+
+
 
 
 }
