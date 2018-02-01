@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -93,7 +95,7 @@ public class FirebaseConnection {
      * Comprueba si el usuario está registrado, devuelve un booleano indicando si existe o no
      */
 
-    private boolean signIn(String email, String password, final Context context) {
+    public boolean signIn(String email, String password, final Context context) {
         Log.d(TAG, "signIn:" + email);
         final boolean[] resultado = {false};
 
@@ -134,6 +136,13 @@ public class FirebaseConnection {
         return userDir;
     }
 
+
+    public void insertUserDB(String email, String uid, String pass){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+
+        myRef.setValue("Hello, World!");
+    }
 
     public boolean upload(String img){
         Uri file = Uri.fromFile(new File(img));
