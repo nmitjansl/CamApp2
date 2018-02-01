@@ -23,8 +23,8 @@ public class FirebaseConnection{
     private ArrayList<String> userDir;
 
 
-    FirebaseConnection(String user, StorageReference storageRef){
-        this.storageRef = storageRef;
+    FirebaseConnection(String user){
+        storageRef = FirebaseStorage.getInstance().getReference();
         this.user = user;
     }
 
@@ -42,10 +42,7 @@ public class FirebaseConnection{
 
     public boolean upload(String img){
         Uri file = Uri.fromFile(new File(img));
-        if(img.lastIndexOf("/") != -1){
-            img = img.substring(img.lastIndexOf("/")+1);
-        }
-        StorageReference imgRef = storageRef.child(user+"/"+img);
+        StorageReference imgRef = storageRef.child(user);
 
         imgRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -124,5 +121,10 @@ public class FirebaseConnection{
 
     public void setUserDir(ArrayList<String> userDir) {
         this.userDir = userDir;
+    }
+
+    public static void main(String[] args) {
+        FirebaseConnection firebaseConnection = new FirebaseConnection("lpbove@gmail.com");
+        firebaseConnection.upload("testIMG.png");
     }
 }
