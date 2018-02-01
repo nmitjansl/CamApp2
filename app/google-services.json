@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1033662647187",
+    "firebase_url": "https://camapp2-6b6a8.firebaseio.com",
+    "project_id": "camapp2-6b6a8",
+    "storage_bucket": "camapp2-6b6a8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033662647187:android:c2e7646cf9aaacf8",
+        "android_client_info": {
+          "package_name": "com.escoladeltreball.org.camapp2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1033662647187-sjc1qsd27e6mucbr7b7nvgqlgkv72hhp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.escoladeltreball.org.camapp2",
+            "certificate_hash": "2e50189042baeb8cbc2735d0ecf3cf1be5c80857"
+          }
+        },
+        {
+          "client_id": "1033662647187-rpta62l43uk4pc9ife92fhahkc0mc34v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl968RwWaM2azh2Oor7gqgjmSnsUOpEmU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1033662647187-rpta62l43uk4pc9ife92fhahkc0mc34v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
