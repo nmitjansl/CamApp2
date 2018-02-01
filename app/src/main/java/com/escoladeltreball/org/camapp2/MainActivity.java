@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 
+import com.escoladeltreball.org.camapp2.api.firebase.FirebaseConnection;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
@@ -28,5 +29,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         storageRef = FirebaseStorage.getInstance().getReference();
+        //TEST
+        FirebaseConnection firebaseConnection = new FirebaseConnection("lpbove@gmail.com",storageRef);
+        firebaseConnection.insertUserDB("bar@gmail.com","002","foo");
     }
 }

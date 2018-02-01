@@ -10,12 +10,14 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.escoladeltreball.org.camapp2.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FileDownloadTask;
@@ -45,7 +47,7 @@ public class FirebaseConnection {
     public FirebaseConnection() {
     }
 
-    FirebaseConnection(String user, StorageReference storageRef) {
+    public FirebaseConnection(String user, StorageReference storageRef) {
         this.storageRef = storageRef;
         this.user = user;
     }
@@ -56,7 +58,7 @@ public class FirebaseConnection {
      */
 
 
-    public boolean createUser(String email, String password, final Context context) {
+    public boolean createUser(final String email, final String password, final Context context) {
         final boolean[] resultado = {false};
         this.context = context;
         mAuth = FirebaseAuth.getInstance();
@@ -73,6 +75,9 @@ public class FirebaseConnection {
                     TextView v = toast.getView().findViewById(android.R.id.message);
                     v.setTextColor(Color.GREEN);
                     toast.show();
+                    FirebaseUser user = mAuth.getCurrentUser();
+
+                    insertUserDB(user.getEmail(), user.getUid(), password);
 
                     /*FirebaseUser userFireBase = mAuth.getCurrentUser();
                     String userEmail = userFireBase.getEmail();
@@ -139,9 +144,9 @@ public class FirebaseConnection {
 
     public void insertUserDB(String email, String uid, String pass){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-
-        myRef.setValue("Hello, World!");
+        DatabaseReference myRef = database.getReference().child("users"+"/"+"users_data").child(uid);
+        User user = new User(email,uid,pass);
+        myRef.setValue(user);
     }
 
     public boolean upload(String img){
