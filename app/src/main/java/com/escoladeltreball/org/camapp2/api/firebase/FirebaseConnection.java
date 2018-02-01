@@ -43,12 +43,10 @@ public class FirebaseConnection {
     public FirebaseConnection() {
     }
 
-    FirebaseConnection(String user, String path) {
-        storageRef = FirebaseStorage.getInstance().getReference();
+    FirebaseConnection(String user, StorageReference storageRef) {
+        this.storageRef = storageRef;
         this.user = user;
-        this.path = path;
     }
-
 
     /**
      * Registra usuarios con el método de autentificación de firebase, el password tiene que tener un mínimo
@@ -126,21 +124,24 @@ public class FirebaseConnection {
         return resultado[0];
     }
 
-
-    public ArrayList<String> listDirectory() {
-        allDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()).list());
+    public ArrayList<String> listDirectory(){
+        allDir =(ArrayList<String>)Arrays.asList(new File(storageRef.getPath()).list());
         return allDir;
     }
 
-    public ArrayList<String> listUserDirectory(String user) {
-        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath() + "/" + user).list());
+    public ArrayList<String> listUserDirectory(String user){
+        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()+"/"+user).list());
         return userDir;
     }
 
 
-    public boolean upload(String img) {
+    public boolean upload(String img){
         Uri file = Uri.fromFile(new File(img));
-        StorageReference imgRef = storageRef.child(user);
+        if(img.contains("/")){
+            img = img.substring(img.lastIndexOf("/")+1);
+        }
+        StorageReference imgRef = storageRef.child(user+"/"+img);
+
 
         imgRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -160,11 +161,11 @@ public class FirebaseConnection {
         return true;
     }
 
-    public boolean download(StorageReference imgRef, String fileName) {
+    public boolean download(StorageReference imgRef, String fileName){
         File localFile = null;
         String[] split = fileName.split(".");
         try {
-            localFile = File.createTempFile(split[0], split[1]);
+            localFile = File.createTempFile(split[0],split[1]);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
