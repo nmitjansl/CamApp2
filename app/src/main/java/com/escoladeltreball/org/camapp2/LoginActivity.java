@@ -45,20 +45,16 @@ public class LoginActivity extends CameraLauncher {
             TextView v = toast.getView().findViewById(android.R.id.message);
             v.setTextColor(Color.RED);
             toast.show();
-        } else {
+        } else if (firebaseConnection.signIn(userEmail,pass,getApplicationContext())){
             Toast.makeText(this, "Signed In", Toast.LENGTH_LONG);
             setUserLogin(userEmail);
             config.setProperty("user", userEmail);
             guardarConfig();
+            Intent intent = new Intent(this, CameraLauncher.class);
+            startActivity(intent);
+
         }
 
-//            if (username.getText().toString().equals(user)&&password.getText().toString().equals(pass)){
-//                Intent intent = new Intent(this,CameraLauncher.class);
-//                startActivity(intent);
-//                //userLogin = user;
-//            }else {
-//            Toast.makeText(this,"User not registered",Toast.LENGTH_LONG).show();
-//        }
     }
 
     private void attempSignUp() {
@@ -76,6 +72,8 @@ public class LoginActivity extends CameraLauncher {
             setUserLogin(userEmail);
             config.setProperty("user", userEmail);
             guardarConfig();
+            Intent intent = new Intent(this, CameraLauncher.class);
+            startActivity(intent);
         }
     }
 }
