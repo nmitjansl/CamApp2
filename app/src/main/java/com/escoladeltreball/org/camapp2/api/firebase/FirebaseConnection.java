@@ -50,11 +50,14 @@ public class FirebaseConnection {
     }
 
 
-    /**Registra usuarios con el método de autentificación de firebase, el password tiene que tener un mínimo
-    de 6 carácteres y el email tiene que ser válido.*/
+    /**
+     * Registra usuarios con el método de autentificación de firebase, el password tiene que tener un mínimo
+     * de 6 carácteres y el email tiene que ser válido.
+     */
 
 
-    public void registrarUsuario(String email, String password, final Context context) {
+    public boolean createUser(String email, String password, final Context context) {
+        final boolean[] resultado = {false};
         this.context = context;
         mAuth = FirebaseAuth.getInstance();
 
@@ -63,15 +66,21 @@ public class FirebaseConnection {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+                    resultado[0] = true;
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success");
+                    Toast toast = Toast.makeText(context, "Registration succesfull.", Toast.LENGTH_SHORT);
+                    TextView v = toast.getView().findViewById(android.R.id.message);
+                    v.setTextColor(Color.GREEN);
+                    toast.show();
+
                     /*FirebaseUser userFireBase = mAuth.getCurrentUser();
                     String userEmail = userFireBase.getEmail();
                     String userUid = userFireBase.getUid();*/
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                    Toast toast = Toast.makeText(context, "Authentication failed.", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(context, "Registration failed.", Toast.LENGTH_SHORT);
                     TextView v = toast.getView().findViewById(android.R.id.message);
                     v.setTextColor(Color.RED);
                     toast.show();
@@ -79,9 +88,12 @@ public class FirebaseConnection {
 
             }
         });
+        return resultado[0];
     }
 
-    /**Comprueba si el usuario está registrado, devuelve un booleano indicando si existe o no*/
+    /**
+     * Comprueba si el usuario está registrado, devuelve un booleano indicando si existe o no
+     */
 
     private boolean signIn(String email, String password, final Context context) {
         Log.d(TAG, "signIn:" + email);
@@ -173,8 +185,6 @@ public class FirebaseConnection {
         });
         return true;
     }
-
-
 
 
 }
