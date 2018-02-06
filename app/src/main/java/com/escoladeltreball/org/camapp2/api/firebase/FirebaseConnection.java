@@ -81,9 +81,6 @@ public class FirebaseConnection {
 
                     insertUserDB(user.getEmail(), user.getUid(), password, name);
 
-                    /*FirebaseUser userFireBase = mAuth.getCurrentUser();
-                    String userEmail = userFireBase.getEmail();
-                    String userUid = userFireBase.getUid();*/
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -133,13 +130,13 @@ public class FirebaseConnection {
         return resultado[0];
     }
 
-    public ArrayList<String> listDirectory(){
-        allDir =(ArrayList<String>)Arrays.asList(new File(storageRef.getPath()).list());
+    public ArrayList<String> listDirectory() {
+        allDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()).list());
         return allDir;
     }
 
-    public ArrayList<String> listUserDirectory(String user){
-        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()+"/"+user).list());
+    public ArrayList<String> listUserDirectory(String user) {
+        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath() + "/" + user).list());
         return userDir;
     }
 
@@ -147,25 +144,25 @@ public class FirebaseConnection {
     public void insertUserDB(String email, String uid, String pass, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data").child(uid);
-        User user = new User(email, uid, pass, name);
+        User user = new User(uid, name, email,  pass);
         myRef.setValue(user);
     }
 
-    public ArrayList<User> listUsers(){
+    public ArrayList<User> listUsers() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference().child("users"+"/"+"users_data");
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data");
         Query queryRef = myRef.endAt(null);
         //TODO
         //DataSnapshot dataSnapshot =
         return null;
     }
 
-    public boolean upload(String img){
+    public boolean upload(String img) {
         Uri file = Uri.fromFile(new File(img));
-        if(img.contains("/")){
-            img = img.substring(img.lastIndexOf("/")+1);
+        if (img.contains("/")) {
+            img = img.substring(img.lastIndexOf("/") + 1);
         }
-        StorageReference imgRef = storageRef.child(user+"/"+img);
+        StorageReference imgRef = storageRef.child(user + "/" + img);
 
 
         imgRef.putFile(file)
@@ -186,11 +183,11 @@ public class FirebaseConnection {
         return true;
     }
 
-    public boolean download(StorageReference imgRef, String fileName){
+    public boolean download(StorageReference imgRef, String fileName) {
         File localFile = null;
         String[] split = fileName.split(".");
         try {
-            localFile = File.createTempFile(split[0],split[1]);
+            localFile = File.createTempFile(split[0], split[1]);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
