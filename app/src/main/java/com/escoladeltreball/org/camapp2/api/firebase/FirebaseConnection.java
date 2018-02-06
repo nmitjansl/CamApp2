@@ -18,8 +18,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -79,9 +81,6 @@ public class FirebaseConnection {
 
                     insertUserDB(user.getEmail(), user.getUid(), password, name);
 
-                    /*FirebaseUser userFireBase = mAuth.getCurrentUser();
-                    String userEmail = userFireBase.getEmail();
-                    String userUid = userFireBase.getUid();*/
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -144,9 +143,18 @@ public class FirebaseConnection {
 
     public void insertUserDB(String email, String uid, String pass, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data").child(uid);
-        User user = new User(email, uid, pass, name);
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data").child(name);
+        User user = new User(uid, name, email,  pass);
         myRef.setValue(user);
+    }
+
+    public ArrayList<User> listUsers() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data");
+        Query queryRef = myRef.endAt(null);
+        //TODO
+        //DataSnapshot dataSnapshot =
+        return null;
     }
 
     public boolean upload(String img) {
