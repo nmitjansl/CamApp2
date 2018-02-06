@@ -143,7 +143,7 @@ public class FirebaseConnection {
 
     public void insertUserDB(String email, String uid, String pass, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data").child(uid);
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data").child(name);
         User user = new User(uid, name, email,  pass);
         myRef.setValue(user);
     }
