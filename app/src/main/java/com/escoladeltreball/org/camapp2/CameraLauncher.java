@@ -9,6 +9,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.escoladeltreball.org.camapp2.api.firebase.FirebaseConnection;
+import com.escoladeltreball.org.camapp2.models.User;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,8 +22,8 @@ import java.util.Properties;
 
 public class CameraLauncher extends AppCompatActivity {
     private static File fconfig = new File("config.properties");
-    protected static Properties config;
-    private static String userLogin;
+    protected static Properties config = new Properties();
+    private static User user = new User();
 
     protected static FirebaseConnection firebaseConnection = new FirebaseConnection();
 
@@ -28,8 +31,8 @@ public class CameraLauncher extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         leerConfig();
-        userLogin = config.getProperty("user");
-        if (userLogin == null) {
+        readUserLogin();
+        if (user.getEmail() == "") {
             Intent intent = new Intent(this,LoginActivity.class);
             startActivity(intent);
         } else {
@@ -48,11 +51,16 @@ public class CameraLauncher extends AppCompatActivity {
         }
     }
 
-    protected static void setUserLogin(String emailUser) {
-        userLogin = emailUser;
+    protected static void readUserLogin() {
+        user.setEmail(config.getProperty("email"));
+        user.setName(config.getProperty("username"));
     }
 
-    public static String getUserLogin() {return userLogin;}
+    protected static void setUserLogin(User userobject) {
+        user = userobject;
+    }
+
+    public static User getUserLogin() {return user;}
 
     protected static void guardarConfig() {
         generarConfig();
@@ -71,8 +79,8 @@ public class CameraLauncher extends AppCompatActivity {
     private static void generarConfig() {
         if (!fconfig.exists()) {
             try {
-                config.setProperty("user", null);
-                config.setProperty("token", null);
+                config.setProperty("username", "");
+                config.setProperty("email", "");
                 config.store(new FileOutputStream(fconfig), "First config save");
             } catch (IOException e) {}
         }
