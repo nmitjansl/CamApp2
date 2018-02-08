@@ -28,7 +28,10 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -157,15 +160,17 @@ public class FirebaseConnection {
         return null;
     }
 
-    public boolean upload(String img) {
-        Uri file = Uri.fromFile(new File(img));
-        if (img.contains("/")) {
-            img = img.substring(img.lastIndexOf("/") + 1);
+    public boolean upload(String path) {
+        String name = path.contains("/") ? path.substring(path.indexOf('/')+1) :  path ;
+        StorageReference imgRef = storageRef.child(user).child(name);
+
+        InputStream stream = null;
+        try {
+            stream = new FileInputStream(new File(path));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-        StorageReference imgRef = storageRef.child(user + "/" + img);
-
-
-        imgRef.putFile(file)
+        imgRef.putStream(stream)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
