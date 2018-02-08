@@ -27,7 +27,7 @@ public class CameraActivity extends AppCompatActivity {
 
         openCamera();
         if(imgUri != null){
-            //FirebaseConnection.upload(imgUri);
+            //FirebaseConnection.upload(imgUri); // TODO descomentar esto cuando Luca lo diga
         }
         finish();
 
