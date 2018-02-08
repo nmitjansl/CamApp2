@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.escoladeltreball.org.camapp2.api.firebase.FirebaseConnection;
+
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
@@ -23,8 +25,8 @@ public class CameraActivity extends AppCompatActivity {
     String mCurrentPhotoPath;*/
 
     private static final String GALLERY = "/CamApp2";
+    private File imgFile;
     private static final int MY_REQUEST_CODE = 12;
-    private static final int TAKE_PICTURE = 1;
 
     private static final String LOG_TAG = "CamAPP2Log";
 
@@ -36,6 +38,9 @@ public class CameraActivity extends AppCompatActivity {
         //dispatchTakePictureIntent();
 
         openCamera();
+        if(imgFile != null){
+            //FirebaseConnection.upload(imgFile.getPath());
+        }
 
     }
 
@@ -54,17 +59,18 @@ public class CameraActivity extends AppCompatActivity {
     private Uri getImageUri() {
 
 
-        File file = new File(Environment.getExternalStoragePublicDirectory(
+        File galleryFile = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES) + GALLERY);
-        if (!file.exists()) {
-            file.mkdirs();
+        if (!galleryFile.exists()) {
+            galleryFile.mkdirs();
             Log.e(LOG_TAG, "Directory created");
         } else {
             Log.e(LOG_TAG, "Directory not created");
         }
-        File file2 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + GALLERY, System.currentTimeMillis() + ".jpeg");
+        File image = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + GALLERY, System.currentTimeMillis() + ".jpeg");
+        imgFile = image;
 
-        Uri imgUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file2);
+        Uri imgUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", image);
 
         return imgUri;
     }
