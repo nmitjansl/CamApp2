@@ -2,6 +2,7 @@ package com.escoladeltreball.org.camapp2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +22,7 @@ import java.io.Reader;
 import java.util.Properties;
 
 public class CameraLauncher extends AppCompatActivity {
-    private static File fconfig = new File("config.properties");
+    private static File fconfig = new File(Environment.getExternalStorageDirectory(),"config.properties");
     protected static Properties config = new Properties();
     private static User user = new User();
 
@@ -32,7 +33,7 @@ public class CameraLauncher extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         leerConfig();
         readUserLogin();
-        if (user.getEmail() == "") {
+        if (user.getEmail().isEmpty()) {
             Intent intent = new Intent(this,LoginActivity.class);
             startActivity(intent);
         } else {
@@ -52,6 +53,7 @@ public class CameraLauncher extends AppCompatActivity {
     }
 
     protected static void readUserLogin() {
+        System.out.println("Email: " + config.getProperty("email"));
         user.setEmail(config.getProperty("email"));
         user.setName(config.getProperty("username"));
     }
@@ -79,10 +81,17 @@ public class CameraLauncher extends AppCompatActivity {
     private static void generarConfig() {
         if (!fconfig.exists()) {
             try {
+                fconfig.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
                 config.setProperty("username", "");
                 config.setProperty("email", "");
                 config.store(new FileOutputStream(fconfig), "First config save");
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
