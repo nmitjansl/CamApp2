@@ -30,7 +30,6 @@ public class CameraLauncher extends AppCompatActivity {
             //FirebaseConnection.upload(imgUri); // TODO descomentar esto cuando Luca lo diga
         }
         finish();
-
     }
 
     private void openCamera() {

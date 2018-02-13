@@ -16,7 +16,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    buildToolsVersion '27.0.2'
+    buildToolsVersion '26.0.2'
 }
 
 dependencies {
@@ -29,7 +29,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
-
-
 
 //apply plugin: 'com.google.gms.google-services'
