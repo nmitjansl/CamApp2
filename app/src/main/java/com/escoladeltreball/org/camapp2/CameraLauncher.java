@@ -1,18 +1,19 @@
 package com.escoladeltreball.org.camapp2;
 
 import android.content.Intent;
-import android.os.Bundle;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.escoladeltreball.org.camapp2.api.firebase.FirebaseConnection;
 import com.escoladeltreball.org.camapp2.models.User;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +28,12 @@ public class CameraLauncher extends AppCompatActivity {
     private static User user = new User();
 
     protected static FirebaseConnection firebaseConnection = new FirebaseConnection();
+
+    private static final String GALLERY = "/CamApp2";
+    private Uri imgUri;
+    private static final int MY_REQUEST_CODE = 12;
+
+    private static final String LOG_TAG = "CamAPP2Log";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +52,10 @@ public class CameraLauncher extends AppCompatActivity {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    openCamera();
+                    if(imgUri != null){
+                        firebaseConnection.upload(imgUri.toString()); // TODO pendiente a Luca lo diga
+                    }
                 }
             });
         }
@@ -93,5 +102,35 @@ public class CameraLauncher extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void openCamera() {
+        try {
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, getImageUri());
+
+            startActivityForResult(cameraIntent, MY_REQUEST_CODE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Uri getImageUri() {
+
+
+        File galleryFile = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES) + GALLERY);
+        if (!galleryFile.exists()) {
+            galleryFile.mkdirs();
+            Log.e(LOG_TAG, "Directory created");
+        } else {
+            Log.e(LOG_TAG, "Directory not created");
+        }
+        File image = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + GALLERY, System.currentTimeMillis() + ".jpeg");
+        Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", image);
+        imgUri = uri;
+
+        return uri;
     }
 }
