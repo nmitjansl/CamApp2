@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.escoladeltreball.org.camapp2.CameraActivity">
+    tools:context="com.escoladeltreball.org.camapp2.CameraLauncher">
 
     <TextView
         android:id="@+id/textView"

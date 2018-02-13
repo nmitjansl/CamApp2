@@ -11,7 +11,7 @@ import android.util.Log;
 
 import java.io.File;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraLauncher extends AppCompatActivity {
 
 
     private static final String GALLERY = "/CamApp2";
