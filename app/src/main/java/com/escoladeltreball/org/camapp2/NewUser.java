@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class NewUser extends CameraLauncher {
+public class NewUser extends AppCompatActivity {
 
     private EditText newName;
     private EditText newEmail;
@@ -41,16 +41,20 @@ public class NewUser extends CameraLauncher {
             TextView v = toast.getView().findViewById(android.R.id.message);
             v.setTextColor(Color.RED);
             toast.show();
-        } else if (firebaseConnection.createUser(userEmail, pass, getApplicationContext(), userName)){
+        } else if (CameraLauncher.firebaseConnection.createUser(userEmail, pass, getApplicationContext(), userName)){
             Toast toast = Toast.makeText(this, "Signed In", Toast.LENGTH_LONG);
             TextView v = toast.getView().findViewById(android.R.id.message);
             v.setTextColor(Color.GREEN);
             toast.show();
-            config.setProperty("email", userEmail);
-            readUserLogin();
-            guardarConfig();
-            Intent intent = new Intent(this, CameraLauncher.class);
-            startActivity(intent);
+            CameraLauncher.config.setProperty("email", userEmail);
+            CameraLauncher.readUserLogin();
+            CameraLauncher.guardarConfig();
+            finish();
+        } else {
+            Toast toast = Toast.makeText(this,"Registration failed", Toast.LENGTH_LONG);
+            TextView v = toast.getView().findViewById(android.R.id.message);
+            v.setTextColor(Color.RED);
+            toast.show();
         }
     }
 }

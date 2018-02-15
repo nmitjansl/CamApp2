@@ -11,15 +11,13 @@ import android.widget.Toast;
 
 import com.escoladeltreball.org.camapp2.api.firebase.FirebaseConnection;
 
-public class LoginActivity extends CameraLauncher {
+public class LoginActivity extends AppCompatActivity {
 
     private Button signIn;
     private Button signUp;
     private EditText username;
     private EditText password;
-    private String userEmail;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -36,28 +34,32 @@ public class LoginActivity extends CameraLauncher {
     }
 
     private void attempLogin() {
-        userEmail = username.getText()+"";
+        String userEmail = username.getText()+"";
         String pass = password.getText()+"";
-
 
         if (!userEmail.contains("@") || pass.length() < 6){
             Toast toast = Toast.makeText(this,"Email or password are invalid", Toast.LENGTH_LONG);
             TextView v = toast.getView().findViewById(android.R.id.message);
             v.setTextColor(Color.RED);
             toast.show();
-        } else if (firebaseConnection.signIn(userEmail,pass,getApplicationContext())){
+        } else if (CameraLauncher.firebaseConnection.signIn(userEmail,pass,getApplicationContext())){
 
             Toast toast = Toast.makeText(this, "Signed In", Toast.LENGTH_LONG);
             TextView v = toast.getView().findViewById(android.R.id.message);
             v.setTextColor(Color.GREEN);
             toast.show();
-            config.setProperty("username", userEmail);
-            guardarConfig();
+            CameraLauncher.config.setProperty("username", userEmail);
+            CameraLauncher.guardarConfig();
             Intent intent = new Intent(this, CameraLauncher.class);
             startActivity(intent);
+            finish();
 
+        } else {
+            Toast toast = Toast.makeText(this, "Login failed", Toast.LENGTH_LONG);
+            TextView v = toast.getView().findViewById(android.R.id.message);
+            v.setTextColor(Color.RED);
+            toast.show();
         }
-
     }
 
     private void buttonSignUp() {
