@@ -43,7 +43,7 @@ public class CameraLauncher extends AppCompatActivity {
         if (user.getEmail().isEmpty()) {
             Intent intent = new Intent(this,LoginActivity.class);
             startActivity(intent);
-            finish();
+            //finish();
         } else {
             setContentView(R.layout.activity_camera_launcher);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
