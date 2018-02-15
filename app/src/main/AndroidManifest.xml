@@ -33,7 +33,7 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".Gallery"></activity>
+        <activity android:name=".PhotoListActivity"></activity>
     </application>
 
 </manifest>
