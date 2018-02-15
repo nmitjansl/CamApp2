@@ -4,12 +4,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.escoladeltreball.org.camapp2.models.Image;
 import com.escoladeltreball.org.camapp2.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -18,10 +20,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -34,6 +39,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 public class FirebaseConnection {
@@ -47,6 +56,7 @@ public class FirebaseConnection {
     private ArrayList<String> allDir;
     private ArrayList<String> userDir;
     private Context context;
+    private FirebaseUser userFire;
 
 
     public FirebaseConnection() {
@@ -80,9 +90,9 @@ public class FirebaseConnection {
                     TextView v = toast.getView().findViewById(android.R.id.message);
                     v.setTextColor(Color.GREEN);
                     toast.show();
-                    FirebaseUser user = mAuth.getCurrentUser();
+                    userFire = mAuth.getCurrentUser();
 
-                    insertUserDB(user.getEmail(), user.getUid(), password, name);
+                    insertUserDB(userFire.getEmail(), userFire.getUid(), password, name);
 
                 } else {
                     // If sign in fails, display a message to the user.
@@ -107,6 +117,7 @@ public class FirebaseConnection {
         final boolean[] resultado = {false};
 
 
+        mAuth = FirebaseAuth.getInstance();
         // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -114,6 +125,7 @@ public class FirebaseConnection {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
+                            userFire = mAuth.getCurrentUser();
                             Log.d(TAG, "signInWithEmail:success");
                             resultado[0] = true;
 
@@ -146,45 +158,113 @@ public class FirebaseConnection {
 
     public void insertUserDB(String email, String uid, String pass, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data").child(name);
-        User user = new User(uid, name, email,  pass);
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data").child(uid);
+        User user = new User(uid, name, email, pass);
         myRef.setValue(user);
+    }
+
+    public void insertImageDB(String direccion) {
+        File file = new File(direccion);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference().child("images" + "/" + "image_data").child(userFire.getUid()).child(file.getName());
+        Image image = new Image(userFire.getUid(), direccion);
+
+        myRef.setValue(image);
+
     }
 
     public ArrayList<User> listUsers() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data");
-        Query queryRef = myRef.endAt(null);
-        //TODO
-        //DataSnapshot dataSnapshot =
-        return null;
+        final ArrayList<User> userArrayList = new ArrayList<>();
+
+
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<User> userList = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    User post = snapshot.getValue(User.class);
+                    System.out.println(post.toString());
+                    userArrayList.add(post);
+                    System.out.println(userArrayList.toString());
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+
+
+
+        return userArrayList;
+
+    }
+
+
+    public void prueba() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data");
+        final ArrayList<User> userArrayList = new ArrayList<>();
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User post = dataSnapshot.getValue(User.class);
+                userArrayList.add(post);
+
+                System.out.println(post);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
     }
 
     public boolean upload(String path) {
-        String name = path.contains("/") ? path.substring(path.indexOf('/')+1) :  path ;
-        StorageReference imgRef = storageRef.child(user).child(name);
 
-        InputStream stream = null;
-        try {
-            stream = new FileInputStream(new File(path));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        File file = new File(path);
+
+        if (file.exists()) {
+
+            String name = file.getName();
+            StorageReference imgRef = storageRef.child(user).child(name);
+            InputStream stream = null;
+
+            try {
+                stream = new FileInputStream(new File(path));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            imgRef.putStream(stream)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded content
+                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            // ...
+                        }
+                    });
         }
-        imgRef.putStream(stream)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded content
-                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        // ...
-                    }
-                });
+
+
         return true;
     }
 
