@@ -18,6 +18,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText username;
     private EditText password;
 
+    public static boolean loginOK = false;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -42,24 +44,32 @@ public class LoginActivity extends AppCompatActivity {
             TextView v = toast.getView().findViewById(android.R.id.message);
             v.setTextColor(Color.RED);
             toast.show();
-        } else if (CameraLauncher.firebaseConnection.signIn(userEmail,pass,getApplicationContext())){
-
-            Toast toast = Toast.makeText(this, "Signed In", Toast.LENGTH_LONG);
-            TextView v = toast.getView().findViewById(android.R.id.message);
-            v.setTextColor(Color.GREEN);
-            toast.show();
-            CameraLauncher.config.setProperty("username", userEmail);
-            CameraLauncher.guardarConfig();
-            Intent intent = new Intent(this, CameraLauncher.class);
-            startActivity(intent);
-            finish();
-
-        } else {
-            Toast toast = Toast.makeText(this, "Login failed", Toast.LENGTH_LONG);
-            TextView v = toast.getView().findViewById(android.R.id.message);
-            v.setTextColor(Color.RED);
-            toast.show();
         }
+
+        CameraLauncher.firebaseConnection.signIn(userEmail,pass,getApplicationContext());
+
+        while (!loginOK) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (loginOK) {
+                Toast toast = Toast.makeText(this, "Signed In", Toast.LENGTH_LONG);
+                TextView v = toast.getView().findViewById(android.R.id.message);
+                v.setTextColor(Color.GREEN);
+                toast.show();
+                CameraLauncher.config.setProperty("username", userEmail);
+                CameraLauncher.guardarConfig();
+                Intent intent = new Intent(this, CameraLauncher.class);
+                startActivity(intent);
+                finish();
+            } else continue;
+        }
+        /*Toast toast = Toast.makeText(this, "Login failed", Toast.LENGTH_LONG);
+        TextView v = toast.getView().findViewById(android.R.id.message);
+        v.setTextColor(Color.RED);
+        toast.show();*/
     }
 
     private void buttonSignUp() {
