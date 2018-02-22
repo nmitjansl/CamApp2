@@ -127,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void buttonSignUp() {
         Intent intent = new Intent(context, NewUser.class);
-        startActivity(intent);
+        startActivityForResult(intent,12);
         finish();
     }
 }
