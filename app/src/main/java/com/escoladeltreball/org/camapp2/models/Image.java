@@ -6,25 +6,25 @@ package com.escoladeltreball.org.camapp2.models;
 
 public class Image {
 
-    private String uid;
+    private String email;
     private String direccio;
     private String likes;
 
     public Image() {
     }
 
-    public Image(String uid, String direccio) {
-        this.uid = uid;
+    public Image(String email, String direccio) {
+        this.email = email;
         this.direccio = direccio;
         likes = String.valueOf(0);
     }
 
     public String getUid() {
-        return uid;
+        return email;
     }
 
     public void setUid(String uid) {
-        this.uid = uid;
+        this.email = uid;
     }
 
     public String getDireccio() {
