@@ -116,7 +116,7 @@ public class FirebaseConnection {
                 });
     }
 
-    public User insertUserDB(String email, String uid, String pass, String name) {
+    public static User insertUserDB(String email, String uid, String pass, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data").child(uid);
         User user = new User(uid, name, email, pass);
