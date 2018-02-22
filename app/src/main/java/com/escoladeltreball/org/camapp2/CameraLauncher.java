@@ -1,6 +1,7 @@
 package com.escoladeltreball.org.camapp2;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -10,7 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.escoladeltreball.org.camapp2.api.firebase.FirebaseConnection;
 import com.escoladeltreball.org.camapp2.models.User;
@@ -19,15 +21,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.Properties;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 public class CameraLauncher extends AppCompatActivity {
-    private static File fconfig = new File(Environment.getExternalStorageDirectory(),"config.properties");
-    protected static Properties config = new Properties();
-    private static User user = new User();
+    private static File fuser;
+    private static User user;
 
-    protected static FirebaseConnection firebaseConnection = new FirebaseConnection();
+    protected FirebaseConnection firebaseConnection = new FirebaseConnection();
 
     private static final String GALLERY = "/CamApp2";
     private Uri imgUri;
@@ -35,75 +37,116 @@ public class CameraLauncher extends AppCompatActivity {
 
     private static final String LOG_TAG = "CamAPP2Log";
 
+    private static boolean started;
+
+    private static ArrayList<User> userList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        leerConfig();
-        readUserLogin();
-        if (user.getEmail().isEmpty()) {
-            Intent intent = new Intent(this,LoginActivity.class);
+        try {
+            if (!started) {
+                readUser();
+                System.out.println("Usuario leído");
+                started = true;
+            }
+        } catch (Exception e) {
+            Toast toast = Toast.makeText(getApplicationContext(),"CamAPP2 needs write SD permissions", Toast.LENGTH_LONG);
+            TextView v = toast.getView().findViewById(android.R.id.message);
+            v.setTextColor(Color.RED);
+            toast.show();
+            e.printStackTrace();
+            requestPermissions();
+        }
+
+        if (user == null) {
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
-            //finish();
+            finish();
         } else {
-            setContentView(R.layout.activity_camera_launcher);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setContentView(R.layout.content_camera_launcher);
+            Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
-            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    openCamera();
-                    if(imgUri != null){
-                        firebaseConnection.upload(imgUri.toString()); // TODO pendiente a Luca lo diga
-                    }
+            FloatingActionButton fab = findViewById(R.id.fab);
+            fab.setOnClickListener(view -> {
+                openCamera();
+                if(imgUri != null){
+                    firebaseConnection.upload(imgUri.toString()); // TODO pendiente a Luca lo diga
                 }
             });
         }
     }
 
-    protected static void readUserLogin() {
-        System.out.println("Email: " + config.getProperty("email"));
-        user.setEmail(config.getProperty("email"));
-        user.setName(config.getProperty("username"));
-    }
-
-    protected static void setUserLogin(User userobject) {
-        user = userobject;
-    }
-
-    public static User getUserLogin() {return user;}
-
-    protected static void guardarConfig() {
-        generarConfig();
+    @Override
+    protected void onStop() {
         try {
-            config.store(new FileOutputStream(fconfig), "Config saved succesfully");
-        } catch (IOException e) {}
-    }
-
-    private static void leerConfig() {
-       generarConfig();
-        try {
-            config.load(new FileInputStream(fconfig));
-        } catch (IOException e) {}
-    }
-
-    private static void generarConfig() {
-        if (!fconfig.exists()) {
-            try {
-                fconfig.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                config.setProperty("username", "");
-                config.setProperty("email", "");
-                config.store(new FileOutputStream(fconfig), "First config save");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            saveUser();
+            System.out.println("Usuario guardado");
+        } catch (IOException e) {
+            requestPermissions();
+            Toast toast = Toast.makeText(getApplicationContext(),"CamAPP2 needs write SD permissions", Toast.LENGTH_LONG);
+            TextView v = toast.getView().findViewById(android.R.id.message);
+            v.setTextColor(Color.RED);
+            toast.show();
+            e.printStackTrace();
+        } finally {
+            finish();
+            super.onStop();
         }
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    private void requestPermissions() {
+        // TODO Pedir permisos en caso de que no los tenga
+    }
+
+    /* PUBLIC USER FUNCTIONS */
+
+    protected static User getUser() {
+        return user;
+    }
+
+    protected static void updateUser(User u) {
+        user = u;
+    }
+
+    /* PRIVATE FUNCTIONS USER */
+
+    private synchronized void saveUser() throws IOException {
+        //Saving of object in a file
+        FileOutputStream file = new FileOutputStream(fuser);
+        ObjectOutputStream out = new ObjectOutputStream(file);
+
+        // Method for serialization of object
+        out.writeObject(user);
+
+        out.close();
+        file.close();
+    }
+
+    private synchronized void readUser() throws IOException, ClassNotFoundException {
+        fuser = new File(getExternalFilesDir(null), "user.dat");
+        if (!fuser.exists()) {
+            saveUser();
+            readUser();
+            return;
+        }
+        FileInputStream file = new FileInputStream(fuser);
+        ObjectInputStream in = new ObjectInputStream(file);
+
+        // Method for deserialization of object
+        user = (User)in.readObject();
+
+        in.close();
+        file.close();
+    }
+
+    /* PRIVATE CAMERA FUNCTIONS */
 
     private void openCamera() {
         try {
