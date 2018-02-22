@@ -64,7 +64,7 @@ public class CameraLauncher extends AppCompatActivity {
             startActivity(intent);
             finish();
         } else {
-            setContentView(R.layout.content_camera_launcher);
+            setContentView(R.layout.activity_camera_launcher);
             Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
@@ -91,7 +91,7 @@ public class CameraLauncher extends AppCompatActivity {
             toast.show();
             e.printStackTrace();
         } finally {
-            finish();
+            //finish();
             super.onStop();
         }
     }
