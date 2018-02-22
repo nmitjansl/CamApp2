@@ -25,13 +25,13 @@ class GridViewAdapter extends BaseAdapter {
         this.context = context;
 
         // Ensure we get a different ordering of images on each run.
-        /*Collections.addAll(urls, Data.URLS);
-        Collections.shuffle(urls);*/
+        Collections.addAll(urls, Data.URLS);
+        Collections.shuffle(urls);
 
         // Triple up the list.
-        /*ArrayList<String> copy = new ArrayList<>(urls);
+        ArrayList<String> copy = new ArrayList<>(urls);
         urls.addAll(copy);
-        urls.addAll(copy);*/
+        urls.addAll(copy);
         urls.add("https://i.imgur.com/DYPjpkX.jpg");
     }
 
