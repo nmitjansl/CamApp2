@@ -65,8 +65,8 @@ public class NewUser extends AppCompatActivity {
                             toast.show();
                             FirebaseUser u = FirebaseAuth.getInstance().getCurrentUser();
                             assert u != null;
-                            //User user = FirebaseConnection.insertUserDB(u.getEmail(), u.getUid(), pass, userName);
-                            //CameraLauncher.updateUser(user);
+                            User user = FirebaseConnection.insertUserDB(u.getEmail(), u.getUid(), pass, userName);
+                            CameraLauncher.updateUser(user);
                             try {
                                 Thread.sleep(500);
                             } catch (InterruptedException e) {}
