@@ -49,14 +49,14 @@ public class FirebaseConnection {
     @VisibleForTesting
     public ProgressDialog mProgressDialog;
     private static final String TAG = "EmailPassword";
-    private FirebaseAuth mAuth;
+    public FirebaseAuth mAuth;
     private StorageReference storageRef;
     private String user;
     private String path;
     private ArrayList<String> allDir;
     private ArrayList<String> userDir;
     private Context context;
-    private FirebaseUser userFire;
+    public FirebaseUser userFire;
 
 
     public FirebaseConnection() {
@@ -73,50 +73,31 @@ public class FirebaseConnection {
      */
 
 
-    public boolean createUser(final String email, final String password, final Context context, final String name) {
-        final boolean[] resultado = {false};
+    public void createUser(final String email, final String password, final Context context, final String name) {
         this.context = context;
         mAuth = FirebaseAuth.getInstance();
-
-        // [START create_user_with_email]
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    resultado[0] = true;
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "createUserWithEmail:success");
-                    Toast toast = Toast.makeText(context, "Registration succesfull.", Toast.LENGTH_SHORT);
-                    TextView v = toast.getView().findViewById(android.R.id.message);
-                    v.setTextColor(Color.GREEN);
-                    toast.show();
                     userFire = mAuth.getCurrentUser();
 
                     insertUserDB(userFire.getEmail(), userFire.getUid(), password, name);
 
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                    Toast toast = Toast.makeText(context, "Registration failed.", Toast.LENGTH_SHORT);
-                    TextView v = toast.getView().findViewById(android.R.id.message);
-                    v.setTextColor(Color.RED);
-                    toast.show();
+
                 }
 
             }
         });
-        return resultado[0];
     }
 
     /**
      * Comprueba si el usuario está registrado, devuelve un booleano indicando si existe o no
      */
 
-    public boolean signIn(String email, String password, final Context context) {
+    public void signIn(String email, String password, final Context context) {
         Log.d(TAG, "signIn:" + email);
-        final boolean[] resultado = {false};
-
-
         mAuth = FirebaseAuth.getInstance();
         // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
@@ -126,60 +107,34 @@ public class FirebaseConnection {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             userFire = mAuth.getCurrentUser();
-                            Log.d(TAG, "signInWithEmail:success");
-                            resultado[0] = true;
-
+                            Log.w(TAG, "signInWithEmail:succes");
                         } else {
-                            // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(context, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
 
                         }
-                        // [END_EXCLUDE]
                     }
                 });
-
-
-        // [END sign_in_with_email]
-        return resultado[0];
     }
 
-    public ArrayList<String> listDirectory() {
-        allDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath()).list());
-        return allDir;
-    }
-
-    public ArrayList<String> listUserDirectory(String user) {
-        userDir = (ArrayList<String>) Arrays.asList(new File(storageRef.getPath() + "/" + user).list());
-        return userDir;
-    }
-
-
-    public void insertUserDB(String email, String uid, String pass, String name) {
+    public static User insertUserDB(String email, String uid, String pass, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data").child(uid);
         User user = new User(uid, name, email, pass);
         myRef.setValue(user);
+        return user;
     }
 
-    public void insertImageDB(String direccion) {
-        File file = new File(direccion);
-
+    public void insertUserImage(String nombre, String direccio) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference().child("images" + "/" + "image_data").child(userFire.getUid()).child(file.getName());
-        Image image = new Image(userFire.getUid(), direccion);
-
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images").child(nombre);
+        Image image = new Image(userFire.getEmail(), direccio);
         myRef.setValue(image);
-
     }
 
     public ArrayList<User> listUsers() {
+        //Copia desde aquí
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data");
-        final ArrayList<User> userArrayList = new ArrayList<>();
-
-
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -188,12 +143,10 @@ public class FirebaseConnection {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User post = snapshot.getValue(User.class);
                     System.out.println(post.toString());
-                    userArrayList.add(post);
-                    System.out.println(userArrayList.toString());
+                    userList.add(post);
 
                 }
-
-
+                //Haz tu código aquí
             }
 
             @Override
@@ -202,25 +155,30 @@ public class FirebaseConnection {
             }
         });
 
-
-
-
+        //Hasta aquí
+        final ArrayList<User> userArrayList = new ArrayList<>();
         return userArrayList;
 
     }
 
-
-    public void prueba() {
+    public ArrayList<Image> listImages(String uid) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data");
-        final ArrayList<User> userArrayList = new ArrayList<>();
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_image" + "/" + uid);
+        final ArrayList<Image> imageArrayList = new ArrayList<>();
+
+
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                User post = dataSnapshot.getValue(User.class);
-                userArrayList.add(post);
+                List<Image> imageList = new ArrayList<>();
 
-                System.out.println(post);
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Image image = snapshot.getValue(Image.class);
+                    System.out.println(image.toString());
+                    imageList.add(image);
+                }
+                //Una vez tengas la lista, pon tu código aquí.
+
             }
 
             @Override
@@ -228,17 +186,20 @@ public class FirebaseConnection {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
+        return imageArrayList;
 
     }
 
-    public boolean upload(String path) {
 
+
+    public void upload(String path) {
+        //copia metodo
         File file = new File(path);
 
         if (file.exists()) {
 
             String name = file.getName();
-            StorageReference imgRef = storageRef.child(user).child(name);
+            StorageReference imgRef = storageRef.child(userFire.getEmail()).child(name);
             InputStream stream = null;
 
             try {
@@ -248,24 +209,17 @@ public class FirebaseConnection {
             }
 
             imgRef.putStream(stream)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // Get a URL to the uploaded content
-                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                        }
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // Get a URL to the uploaded content
+                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        insertUserImage(userFire.getUid(), String.valueOf(taskSnapshot.getDownloadUrl()));
+                        //pon aqui tu codigo
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                            // ...
-                        }
+                    .addOnFailureListener(exception -> {
+                        // Handle unsuccessful uploads
+                        // ...
                     });
         }
-
-
-        return true;
     }
 
     public boolean download(StorageReference imgRef, String fileName) {
