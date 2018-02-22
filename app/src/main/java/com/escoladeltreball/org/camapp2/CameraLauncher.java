@@ -1,5 +1,6 @@
 package com.escoladeltreball.org.camapp2;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -58,10 +59,10 @@ public class CameraLauncher extends AppCompatActivity {
             e.printStackTrace();
             requestPermissions();
         }
-
         if (user == null) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
+            setResult(Activity.RESULT_OK,intent);
             finish();
         } else {
             setContentView(R.layout.activity_camera_launcher);
