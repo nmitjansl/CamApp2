@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">CamApp2</string>
-    <string name="title_activity_camera_launcher">CameraLauncher</string>
+    <string name="app_name">Skimdoo Camera / Gallery</string>
+    <string name="title_activity_camera_launcher">SK Camera</string>
 </resources>
