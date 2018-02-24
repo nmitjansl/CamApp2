@@ -1,9 +1,4 @@
 <resources>
     <string name="app_name">CamApp2</string>
     <string name="title_activity_camera_launcher">CameraLauncher</string>
-    <string name="disk_cache_description">On Ice Cream Sandwich and above, a disk cache is
-    automatically used so that subsequent requests for the same URL do not re-download the
-    image.\n\nTo enable this functionality on pre-ICS use a standalone HTTP client with caching such
-    as OkHttp.
-  </string>
 </resources>

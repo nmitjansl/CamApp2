@@ -3,10 +3,8 @@ package com.escoladeltreball.org.camapp2;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +12,6 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -31,15 +26,83 @@ public class PhotoListActivity extends PicassoActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo_list);
+        /*setContentView(R.layout.activity_photo_list);
 
         GridView gridView = (GridView) findViewById(R.id.grid_view);
         gridView.setAdapter(new GridAdapter(this));
-        gridView.setOnScrollListener(new SampleScrollListener(this));
+        gridView.setOnScrollListener(new ScrollListener(this));*/
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.gallery_content, MasterFragment.newInstance())
+                    .commit();
+        }
     }
 
     void showDetails(String url) {
-        Toast.makeText(this, url, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, url, Toast.LENGTH_SHORT).show();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.gallery_content, DetailFragment.newInstance(url))
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public static class MasterFragment extends Fragment {
+        public static MasterFragment newInstance() {
+            return new MasterFragment();
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            final PhotoListActivity activity = (PhotoListActivity) getActivity();
+            final GridAdapter adapter = new GridAdapter(activity);
+
+            GridView gridView = (GridView) LayoutInflater.from(activity)
+                    .inflate(R.layout.activity_photo_list, container, false);
+            gridView.setAdapter(adapter);
+            gridView.setOnScrollListener(new ScrollListener(activity));
+            gridView.setOnItemClickListener((adapterView, view, position, id) -> {
+                String url = adapter.getItem(position);
+                activity.showDetails(url);
+            });
+            return gridView;
+        }
+    }
+
+    public static class DetailFragment extends Fragment {
+        private static final String KEY_URL = "picasso:url";
+
+        public static DetailFragment newInstance(String url) {
+            Bundle arguments = new Bundle();
+            arguments.putString(KEY_URL, url);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(arguments);
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            Activity activity = getActivity();
+            View view = LayoutInflater.from(activity)
+                    .inflate(R.layout.activity_photo_list_detail, container, false);
+            
+
+            ImageView imageView = (ImageView) view.findViewById(R.id.photo);
+
+            Bundle arguments = getArguments();
+            String url = arguments.getString(KEY_URL);
+
+            Picasso.with(getContext())
+                    .load(url)
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.error)
+                    .fit()
+                    .tag(activity)
+                    .into(imageView);
+
+            return view;
+        }
     }
 }
 
@@ -94,7 +157,7 @@ final class GridAdapter extends BaseAdapter {
                 .tag(context)
                 .into(view);
 
-        view.setOnClickListener(v -> activity.showDetails(url));
+        //view.setOnClickListener(v -> activity.showDetails(url));
 
         return view;
     }
@@ -110,16 +173,17 @@ final class SquaredImageView extends android.support.v7.widget.AppCompatImageVie
         super(context, attrs);
     }
 
-    @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         setMeasuredDimension(getMeasuredWidth(), getMeasuredWidth());
     }
 }
 
-class SampleScrollListener implements AbsListView.OnScrollListener {
+class ScrollListener implements AbsListView.OnScrollListener {
     private final Context context;
 
-    public SampleScrollListener(Context context) {
+    public ScrollListener(Context context) {
         this.context = context;
     }
 
@@ -144,18 +208,9 @@ final class Data {
     static final String BASE = "http://i.imgur.com/";
     static final String EXT = ".jpg";
     static final String[] URLS = {
-            BASE + "CqmBjo5" + EXT, BASE + "zkaAooq" + EXT, BASE + "0gqnEaY" + EXT,
-            BASE + "9gbQ7YR" + EXT, BASE + "aFhEEby" + EXT, BASE + "0E2tgV7" + EXT,
-            BASE + "P5JLfjk" + EXT, BASE + "nz67a4F" + EXT, BASE + "dFH34N5" + EXT,
-            BASE + "FI49ftb" + EXT, BASE + "DvpvklR" + EXT, BASE + "DNKnbG8" + EXT,
-            BASE + "yAdbrLp" + EXT, BASE + "55w5Km7" + EXT, BASE + "NIwNTMR" + EXT,
-            BASE + "DAl0KB8" + EXT, BASE + "xZLIYFV" + EXT, BASE + "HvTyeh3" + EXT,
-            BASE + "Ig9oHCM" + EXT, BASE + "7GUv9qa" + EXT, BASE + "i5vXmXp" + EXT,
-            BASE + "glyvuXg" + EXT, BASE + "u6JF6JZ" + EXT, BASE + "ExwR7ap" + EXT,
-            BASE + "Q54zMKT" + EXT, BASE + "9t6hLbm" + EXT, BASE + "F8n3Ic6" + EXT,
-            BASE + "P5ZRSvT" + EXT, BASE + "jbemFzr" + EXT, BASE + "8B7haIK" + EXT,
-            BASE + "aSeTYQr" + EXT, BASE + "OKvWoTh" + EXT, BASE + "zD3gT4Z" + EXT,
-            BASE + "z77CaIt" + EXT,
+            BASE + "bXSam7h" + EXT, BASE + "KRatyV5" + EXT, BASE + "9hPHF4V" + EXT,
+            BASE + "Gy4fExt" + EXT, BASE + "GIjuplT" + EXT, BASE + "GH4uFn5" + EXT,
+
     };
 
     private Data() {
