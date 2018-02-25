@@ -50,6 +50,7 @@
         android:layout_marginTop="16dp"
         android:backgroundTint="@android:color/holo_blue_dark"
         android:text="Register"
+        android:textColor="@android:color/black"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,10 +65,25 @@
         android:layout_marginStart="32dp"
         android:gravity="center"
         android:text="You accept Privacity Terms on click the 'Register' button."
+        android:textColor="@color/colorPrimary"
         android:textSize="@dimen/fab_margin"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonCreateUser"
+        app:srcCompat="@mipmap/camapp_logo_fg" />
 
 </android.support.constraint.ConstraintLayout>
