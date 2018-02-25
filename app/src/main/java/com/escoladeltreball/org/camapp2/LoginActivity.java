@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.pranavpandey.android.dynamic.toasts.DynamicToast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +38,11 @@ public class LoginActivity extends AppCompatActivity {
     private boolean action;
     private Context context;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
+        setTitle("SIGN IN - CamAPP 2");
         setContentView(R.layout.activity_login);
 
         username = findViewById(R.id.username);
@@ -52,73 +55,72 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (CameraLauncher.getUser() != null) finish();
+    }
+
     private void attempLogin() {
-        final String userEmail = username.getText()+"";
+        final String userEmail = username.getText()+"".replaceAll(" ", "");
         String pass = password.getText()+"";
 
         if (action) return;
         else {
-            signIn.setEnabled(false);
-            action = true;
+            setButtonSignIn(true);
         }
 
         if (userEmail.isEmpty() || !userEmail.contains("@") || pass.length() < 6){
-            Toast toast = Toast.makeText(getApplicationContext(),"Email or password are invalid", Toast.LENGTH_LONG);
-            TextView v = toast.getView().findViewById(android.R.id.message);
-            v.setTextColor(Color.RED);
-            toast.show();
-            action = false;
-            signIn.setEnabled(true);
+            DynamicToast.makeError(context, "Email or password invalid!", 2).show();
+            setButtonSignIn(false);
         } else {
             FirebaseAuth.getInstance().signInWithEmailAndPassword(userEmail, pass).addOnCompleteListener(
                     task -> {
                         if (task.isSuccessful()) {
-                            Toast toast = Toast.makeText(context, "Signed In", Toast.LENGTH_LONG);
-                            TextView v = toast.getView().findViewById(android.R.id.message);
-                            v.setTextColor(Color.GREEN);
-                            toast.show();
-                            try {
-                                Thread.sleep(500);
-                            } catch (InterruptedException e) {}
-
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                             DatabaseReference myRef = database.getReference().child("users" + "/" + "users_data");
 
                             myRef.addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (!action) return;
+                                    boolean isExists = false;
                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                         User user = snapshot.getValue(User.class);
                                         assert user != null;
                                         if (user.getEmail().equalsIgnoreCase(userEmail)) {
                                             CameraLauncher.updateUser(user);
+                                            DynamicToast.makeSuccess(context, "Signed In", 2).show();
                                             Intent intent = new Intent(context, CameraLauncher.class);
                                             startActivity(intent);
-                                            action = false;
-                                            signIn.setEnabled(true);
                                             finish();
+                                            setButtonSignIn(false);
+                                            isExists = true;
                                         }
+                                    }
+                                    if (!isExists) {
+                                        DynamicToast.makeError(context, "We are detected an error with your account, please, register again n.n", 10).show();
+                                        FirebaseAuth.getInstance().getCurrentUser().delete();
+                                        setButtonSignIn(false);
+                                        buttonSignUp();
                                     }
                                 }
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-                                    Toast toast = Toast.makeText(context, "Authentication failed", Toast.LENGTH_LONG);
-                                    TextView v = toast.getView().findViewById(android.R.id.message);
-                                    v.setTextColor(Color.RED);
-                                    toast.show();
-                                    action = false;
-                                    signIn.setEnabled(true);
-                                    System.out.println("The read failed: " + databaseError.getCode());
+                                    DynamicToast.makeWarning(context, "No connection...", 2).show();
+                                    setButtonSignIn(false);
+                                    System.out.println("[LoginActivity] The read failed: " + databaseError.getCode());
                                 }
                             });
                         } else {
-                            Toast toast = Toast.makeText(context, "Authentication failed", Toast.LENGTH_LONG);
-                            TextView v = toast.getView().findViewById(android.R.id.message);
-                            v.setTextColor(Color.RED);
-                            toast.show();
-                            action = false;
-                            signIn.setEnabled(true);
+                            DynamicToast.makeError(context, "Email or password wrong!", 2).show();
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            setButtonSignIn(false);
                         }
                     }
             );
@@ -126,8 +128,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void buttonSignUp() {
-        Intent intent = new Intent(context, NewUser.class);
-        startActivityForResult(intent,12);
-        finish();
+        Intent intent = new Intent(this, NewUser.class);
+        startActivity(intent);
+    }
+
+    private void setButtonSignIn(boolean b) {
+        action = b;
+        signIn.setEnabled(!b);
+        signIn.setPressed(b);
+        if (b) signIn.setTextColor(Color.parseColor("#2f2f2f"));
+        else signIn.setTextColor(Color.WHITE);
     }
 }
