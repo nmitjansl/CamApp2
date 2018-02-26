@@ -1,12 +1,13 @@
 package com.escoladeltreball.org.camapp2;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -16,19 +17,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.escoladeltreball.org.camapp2.api.firebase.FirebaseConnection;
 import com.escoladeltreball.org.camapp2.models.User;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,14 +33,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pranavpandey.android.dynamic.toasts.DynamicToast;
 
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,12 +72,11 @@ public class CameraLauncher extends AppCompatActivity {
         } catch (Exception e) {
             DynamicToast.makeWarning(this,"CamAPP2 needs write SD permissions", 3).show();
             e.printStackTrace();
-            requestPermissions();
+            requestPermissions(WRITE_SD_PERMISSION_CODE);
         }
         if (user == null) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
-            setResult(Activity.RESULT_OK,intent);
             finish();
         } else {
             setContentView(R.layout.activity_camera_launcher);
@@ -133,6 +130,14 @@ public class CameraLauncher extends AppCompatActivity {
                     firebaseConnection.upload(imgUri.toString()); // TODO pendiente a Luca lo diga
                 }
             });
+
+            // MY GALLERY
+            ImageView iv = findViewById(R.id.iv);
+            Button my_photos = findViewById(R.id.my_photos);
+            my_photos.setOnClickListener(v -> {
+                new DownLoadImageTask(iv).execute("https://skimdoo.com/img/logo.png");
+                requestPermissions(WRITE_SD_PERMISSION_CODE);
+            });
         }
     }
 
@@ -140,9 +145,8 @@ public class CameraLauncher extends AppCompatActivity {
     protected void onStop() {
         try {
             saveUser();
-            System.out.println("Usuario guardado");
         } catch (IOException e) {
-            requestPermissions();
+            requestPermissions(WRITE_SD_PERMISSION_CODE);
             DynamicToast.makeWarning(this,"CamAPP2 needs write SD permissions", 3).show();
             e.printStackTrace();
         } finally {
@@ -179,21 +183,29 @@ public class CameraLauncher extends AppCompatActivity {
         }
     }
 
-    private void requestPermissions() {
-        if (!checkPermission(LIST_CONTACTS_PERMISSION_CODE)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.GET_ACCOUNTS},
-                    LIST_CONTACTS_PERMISSION_CODE);
-        }
-        if (!checkPermission(READ_CONTACTS_PERMISSION_CODE)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_CONTACTS},
-                    READ_CONTACTS_PERMISSION_CODE);
-        }
-        if (!checkPermission(WRITE_SD_PERMISSION_CODE)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    WRITE_SD_PERMISSION_CODE);
+    private void requestPermissions(int i) {
+        switch (i) {
+            case 10: {
+                if (!checkPermission(LIST_CONTACTS_PERMISSION_CODE)) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.GET_ACCOUNTS},
+                            LIST_CONTACTS_PERMISSION_CODE);
+                }
+            }
+            case 20: {
+                if (!checkPermission(READ_CONTACTS_PERMISSION_CODE)) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.READ_CONTACTS},
+                            READ_CONTACTS_PERMISSION_CODE);
+                }
+            }
+            case 30: {
+                if (!checkPermission(WRITE_SD_PERMISSION_CODE)) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            WRITE_SD_PERMISSION_CODE);
+                }
+            }
         }
     }
 
@@ -216,7 +228,7 @@ public class CameraLauncher extends AppCompatActivity {
 
         // Method for serialization of object
         out.writeObject(user);
-        DynamicToast.makeSuccess(this, "User saved!");
+        DynamicToast.makeSuccess(this, "User saved!").show();
 
         out.close();
         file.close();
@@ -234,7 +246,7 @@ public class CameraLauncher extends AppCompatActivity {
 
         // Method for deserialization of object
         user = (User)in.readObject();
-        DynamicToast.makeSuccess(this, "User load!");
+        DynamicToast.makeSuccess(this, "User load!").show();
 
         in.close();
         file.close();
@@ -274,6 +286,7 @@ public class CameraLauncher extends AppCompatActivity {
 
     /* PRIVATE API */
     private boolean checkPermission(int requestCode) {
+        DynamicToast.makeWarning(this, "Check permissions...").show();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             switch (requestCode) {
                 case 10: {
@@ -293,6 +306,54 @@ public class CameraLauncher extends AppCompatActivity {
                 }
             }
         }
+        DynamicToast.makeWarning(this, "Your device is not compatible...").show();
         return true;
+    }
+
+    /*
+        AsyncTask enables proper and easy use of the UI thread. This class
+        allows to perform background operations and publish results on the UI
+        thread without having to manipulate threads and/or handlers.
+     */
+
+    /*
+        final AsyncTask<Params, Progress, Result>
+            execute(Params... params)
+                Executes the task with the specified parameters.
+     */
+    private class DownLoadImageTask extends AsyncTask<String,Void,Bitmap> {
+        ImageView imageView;
+
+        public DownLoadImageTask(ImageView imageView){
+            this.imageView = imageView;
+        }
+
+        /*
+            doInBackground(Params... params)
+                Override this method to perform a computation on a background thread.
+         */
+        protected Bitmap doInBackground(String...urls){
+            String urlOfImage = urls[0];
+            Bitmap logo = null;
+            try{
+                InputStream is = new URL(urlOfImage).openStream();
+                /*
+                    decodeStream(InputStream is)
+                        Decode an input stream into a bitmap.
+                 */
+                logo = BitmapFactory.decodeStream(is);
+            }catch(Exception e){ // Catch the download exception
+                e.printStackTrace();
+            }
+            return logo;
+        }
+
+        /*
+            onPostExecute(Result result)
+                Runs on the UI thread after doInBackground(Params...).
+         */
+        protected void onPostExecute(Bitmap result){
+            imageView.setImageBitmap(result);
+        }
     }
 }
