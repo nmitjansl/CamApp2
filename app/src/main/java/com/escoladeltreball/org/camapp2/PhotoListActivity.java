@@ -2,6 +2,7 @@ package com.escoladeltreball.org.camapp2;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -23,9 +24,14 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class PhotoListActivity extends PicassoActivity {
 
+    private ArrayList<String> urls;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        //User user = (User) intent.getParcelableExtra("USER");
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -40,6 +46,10 @@ public class PhotoListActivity extends PicassoActivity {
                 .add(R.id.gallery_content, DetailFragment.newInstance(url))
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public ArrayList<String> getUrls() {
+        return urls;
     }
 
     public static class MasterFragment extends Fragment {
@@ -111,6 +121,7 @@ final class GridAdapter extends BaseAdapter {
         activity = (PhotoListActivity) context;
 
         // Ensure we get a different ordering of images on each run.
+        //Collections.copy(images, activity.getUrls());
         Collections.addAll(images, Data.URLS);
         Collections.shuffle(images);
 
