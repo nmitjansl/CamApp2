@@ -26,11 +26,6 @@ public class PhotoListActivity extends PicassoActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*setContentView(R.layout.activity_photo_list);
-
-        GridView gridView = (GridView) findViewById(R.id.grid_view);
-        gridView.setAdapter(new GridAdapter(this));
-        gridView.setOnScrollListener(new ScrollListener(this));*/
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
