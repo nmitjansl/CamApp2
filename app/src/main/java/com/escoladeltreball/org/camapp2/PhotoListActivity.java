@@ -35,6 +35,8 @@ public class PhotoListActivity extends PicassoActivity {
         Intent intent = getIntent();
         User user = (User) intent.getParcelableExtra("USER");
 
+        // TODO get user images
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.gallery_content, MasterFragment.newInstance())
@@ -43,7 +45,6 @@ public class PhotoListActivity extends PicassoActivity {
     }
 
     void showDetails(String url) {
-        //Toast.makeText(this, url, Toast.LENGTH_SHORT).show();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.gallery_content, DetailFragment.newInstance(url))
                 .addToBackStack(null)
@@ -93,11 +94,10 @@ public class PhotoListActivity extends PicassoActivity {
             Activity activity = getActivity();
             View view = LayoutInflater.from(activity)
                     .inflate(R.layout.activity_photo_list_detail, container, false);
-            
 
             ImageView imageView = (ImageView) view.findViewById(R.id.photo);
             Button btn_like = (Button) view.findViewById(R.id.btn_like);
-            // TODO set listener
+            // TODO set like listener
 
             Bundle arguments = getArguments();
             String url = arguments.getString(KEY_URL);
