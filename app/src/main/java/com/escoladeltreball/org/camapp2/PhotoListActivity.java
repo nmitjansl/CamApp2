@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -94,6 +95,8 @@ public class PhotoListActivity extends PicassoActivity {
             
 
             ImageView imageView = (ImageView) view.findViewById(R.id.photo);
+            Button btn_like = (Button) view.findViewById(R.id.btn_like);
+            // TODO set listener
 
             Bundle arguments = getArguments();
             String url = arguments.getString(KEY_URL);
