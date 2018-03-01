@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.escoladeltreball.org.camapp2.models.User;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class PhotoListActivity extends PicassoActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        //User user = (User) intent.getParcelableExtra("USER");
+        User user = (User) intent.getParcelableExtra("USER");
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
