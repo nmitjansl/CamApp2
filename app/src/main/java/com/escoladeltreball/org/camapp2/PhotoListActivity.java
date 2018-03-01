@@ -15,7 +15,13 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.escoladeltreball.org.camapp2.models.Image;
 import com.escoladeltreball.org.camapp2.models.User;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -49,6 +55,48 @@ public class PhotoListActivity extends PicassoActivity {
                 .add(R.id.gallery_content, DetailFragment.newInstance(url))
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public void listImages(String uid) {
+        //Copia desde aquí
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Image> userImages = new ArrayList<>();
+                DataSnapshot refUid = null;
+                String realUID = null;
+                try{
+                    realUID = dataSnapshot.child("users_images").child(uid).getKey();
+                    if(realUID == uid){
+                        refUid = dataSnapshot.child(uid);
+                    }
+                }catch(Exception e){
+                    refUid = null;
+                }
+                if(realUID == uid){
+                    for(DataSnapshot item : refUid.getChildren()){
+                        Object test = item.getValue();
+                        Image image = item.getValue(Image.class);
+                        if(image != null){
+                            userImages.add(image);
+                        }
+                    }
+                }
+                for(Image img : userImages){
+                    System.out.println(img.toString());
+                }
+                //}
+                //Haz tu código aquí
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+        //Hasta aquí
     }
 
     public ArrayList<String> getUrls() {
