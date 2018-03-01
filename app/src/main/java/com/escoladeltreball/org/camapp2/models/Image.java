@@ -16,7 +16,7 @@ public class Image {
     public Image(String email, String direccio) {
         this.email = email;
         this.direccio = direccio;
-        likes = String.valueOf(0);
+        likes = "0";
     }
 
     public String getUid() {
@@ -41,5 +41,14 @@ public class Image {
 
     public void setLikes(String likes) {
         this.likes = likes;
+    }
+
+    @Override
+    public String toString() {
+        return "Image{" +
+                "email='" + email + '\'' +
+                ", direccio='" + direccio + '\'' +
+                ", likes=" + likes +
+                '}';
     }
 }

@@ -161,24 +161,38 @@ public class FirebaseConnection {
 
     }
 
-    public ArrayList<Image> listImages(String uid) {
+    public void listImages(String uid) {
+        //Copia desde aquí
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_image" + "/" + uid);
-        final ArrayList<Image> imageArrayList = new ArrayList<>();
-
-
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images");
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Image> imageList = new ArrayList<>();
-
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Image image = snapshot.getValue(Image.class);
-                    System.out.println(image.toString());
-                    imageList.add(image);
-                }
-                //Una vez tengas la lista, pon tu código aquí.
-
+                List<Image> userImages = new ArrayList<>();
+                DataSnapshot refUid = null;
+                String realUID = null;
+                    try{
+                        realUID = dataSnapshot.child("users_images").child(uid).getKey();
+                        if(realUID == uid){
+                            refUid = dataSnapshot.child(uid);
+                        }
+                    }catch(Exception e){
+                        refUid = null;
+                    }
+                    if(realUID == uid){
+                        for(DataSnapshot item : refUid.getChildren()){
+                            Object test = item.getValue();
+                            Image image = item.getValue(Image.class);
+                            if(image != null){
+                                userImages.add(image);
+                            }
+                        }
+                    }
+                    for(Image img : userImages){
+                        System.out.println(img.toString());
+                    }
+                //}
+                //Haz tu código aquí
             }
 
             @Override
@@ -186,10 +200,8 @@ public class FirebaseConnection {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
-        return imageArrayList;
-
+        //Hasta aquí
     }
-
 
 
     public void upload(String path) {
@@ -247,6 +259,5 @@ public class FirebaseConnection {
         });
         return true;
     }
-
 
 }
