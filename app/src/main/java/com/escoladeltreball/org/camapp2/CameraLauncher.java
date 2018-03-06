@@ -18,6 +18,8 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -60,10 +62,12 @@ public class CameraLauncher extends AppCompatActivity {
     private static final int WRITE_SD_PERMISSION_CODE = 30;
 
     private static boolean started;
+    private static ArrayList<User> userArrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         try {
             if (!started) {
                 readUser();
@@ -92,9 +96,11 @@ public class CameraLauncher extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     List<String> userList = new ArrayList<>();
+                    userList.add("");
 
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         User post = snapshot.getValue(User.class);
+                        userArrayList.add(post);
                         if (post.getEmail().equalsIgnoreCase(user.getEmail())) continue;
                         userList.add(post.getName());
                     }
@@ -111,6 +117,8 @@ public class CameraLauncher extends AppCompatActivity {
                     System.out.println("[CameraLauncher] The read failed: " + databaseError.getCode());
                 }
             });
+
+
 
             // LOG OUT
             FloatingActionButton fab1 = findViewById(R.id.logOutButton);
@@ -131,12 +139,42 @@ public class CameraLauncher extends AppCompatActivity {
                 }
             });
 
+            Spinner spinner = findViewById(R.id.userList);
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+            {
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+                {
+                    String selectedItem = parent.getItemAtPosition(position).toString();
+                    if (selectedItem.isEmpty()) return;
+                    Intent intent = new Intent(getApplicationContext(), PhotoListActivity.class);
+                    User us = null;
+                    for(User u : userArrayList) {
+                        if (u.getName().equalsIgnoreCase(selectedItem)) us = u;
+                    }
+                    if (us == null) {
+                        DynamicToast.makeError(getApplicationContext(), "Nothing selected!").show();
+                    } else {
+                        intent.putExtra("USER",us);
+                        startActivity(intent);
+                    }
+
+                } // to close the onItemSelected
+                public void onNothingSelected(AdapterView<?> parent)
+                {
+
+                }
+            });
+
             // MY GALLERY
-            ImageView iv = findViewById(R.id.iv);
+//            ImageView iv = findViewById(R.id.iv);
             Button my_photos = findViewById(R.id.my_photos);
             my_photos.setOnClickListener(v -> {
-                new DownLoadImageTask(iv).execute("https://skimdoo.com/img/logo.png");
-                requestPermissions(WRITE_SD_PERMISSION_CODE);
+//                new DownLoadImageTask(iv).execute("https://skimdoo.com/img/logo.png");
+//                requestPermissions(WRITE_SD_PERMISSION_CODE);
+
+                Intent intent = new Intent(this, PhotoListActivity.class);
+                intent.putExtra("USER",user);
+                startActivity(intent);
             });
         }
     }
