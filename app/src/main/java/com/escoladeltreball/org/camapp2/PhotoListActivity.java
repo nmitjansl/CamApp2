@@ -45,11 +45,12 @@ public class PhotoListActivity extends PicassoActivity {
         // TODO get user images
         listImages("pocholo");
 
-        if (savedInstanceState == null) {
+        /*if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.gallery_content, MasterFragment.newInstance())
                     .commit();
-        }
+            Log.v("MYTAG","Commit fragment");
+        }*/
     }
 
     void showDetails(String url) {
@@ -83,20 +84,18 @@ public class PhotoListActivity extends PicassoActivity {
                         Image image = item.getValue(Image.class);
                         if(image != null){
                             userImages.add(image);
-                            Log.v("MYTAG",image.getDireccio()+" - "+image.getUid()+" - "+image.getLikes());
                         }
                     }
                 }
-                Log.v("MYTAG", userImages.size()+"");
-                for (Image image : userImages) {
-                    Log.v("MYTAG",image.getDireccio()+" - "+image.getUid()+" - "+image.getLikes());
-                }
 
-                // addOll
+                // clear urls and addAll
                 for (Image image : userImages) {
                     urls.add(image);
                 }
 
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.gallery_content, MasterFragment.newInstance())
+                        .commit();
             }
 
             @Override
@@ -179,8 +178,10 @@ final class GridAdapter extends BaseAdapter {
         this.context = context;
         activity = (PhotoListActivity) context;
 
-        Log.v("MYTAG","URLS:"+activity.getUrls().size());
-        //Collections.copy(images, activity.getUrls());
+        for (Image image : activity.getUrls()) {
+            images.add(image);
+        }
+
     }
 
     @Override
@@ -207,6 +208,7 @@ final class GridAdapter extends BaseAdapter {
         }
 
         String url = getItem(position).getDireccio();
+        Log.v("MYTAG","getView:"+url);
         Picasso.with(context)
                 .load(url)
                 .placeholder(R.drawable.placeholder)
