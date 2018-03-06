@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +33,7 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class PhotoListActivity extends PicassoActivity {
 
-    private ArrayList<String> urls;
+    private ArrayList<Image> urls = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,7 @@ public class PhotoListActivity extends PicassoActivity {
         User user = (User) intent.getParcelableExtra("USER");
 
         // TODO get user images
+        listImages("pocholo");
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -57,14 +59,14 @@ public class PhotoListActivity extends PicassoActivity {
                 .commit();
     }
 
+    // uid = pocholo
     public void listImages(String uid) {
-        //Copia desde aquí
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images");
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Image> userImages = new ArrayList<>();
+                ArrayList<Image> userImages = new ArrayList<>();
                 DataSnapshot refUid = null;
                 String realUID = null;
                 try{
@@ -81,14 +83,20 @@ public class PhotoListActivity extends PicassoActivity {
                         Image image = item.getValue(Image.class);
                         if(image != null){
                             userImages.add(image);
+                            Log.v("MYTAG",image.getDireccio()+" - "+image.getUid()+" - "+image.getLikes());
                         }
                     }
                 }
-                for(Image img : userImages){
-                    System.out.println(img.toString());
+                Log.v("MYTAG", userImages.size()+"");
+                for (Image image : userImages) {
+                    Log.v("MYTAG",image.getDireccio()+" - "+image.getUid()+" - "+image.getLikes());
                 }
-                //}
-                //Haz tu código aquí
+
+                // addOll
+                for (Image image : userImages) {
+                    urls.add(image);
+                }
+
             }
 
             @Override
@@ -96,10 +104,9 @@ public class PhotoListActivity extends PicassoActivity {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
-        //Hasta aquí
     }
 
-    public ArrayList<String> getUrls() {
+    public ArrayList<Image> getUrls() {
         return urls;
     }
 
@@ -118,7 +125,7 @@ public class PhotoListActivity extends PicassoActivity {
             gridView.setAdapter(adapter);
             gridView.setOnScrollListener(new ScrollListener(activity));
             gridView.setOnItemClickListener((adapterView, view, position, id) -> {
-                String url = adapter.getItem(position);
+                String url = adapter.getItem(position).getDireccio();
                 activity.showDetails(url);
             });
             return gridView;
@@ -166,21 +173,14 @@ public class PhotoListActivity extends PicassoActivity {
 final class GridAdapter extends BaseAdapter {
     private final Context context;
     private final PhotoListActivity activity;
-    private final List<String> images = new ArrayList<>();
+    private final List<Image> images = new ArrayList<>();
 
     public GridAdapter(Context context) {
         this.context = context;
         activity = (PhotoListActivity) context;
 
-        // Ensure we get a different ordering of images on each run.
+        Log.v("MYTAG","URLS:"+activity.getUrls().size());
         //Collections.copy(images, activity.getUrls());
-        Collections.addAll(images, Data.URLS);
-        Collections.shuffle(images);
-
-        // Triple up the list.
-        ArrayList<String> copy = new ArrayList<>(images);
-        images.addAll(copy);
-        images.addAll(copy);
     }
 
     @Override
@@ -189,7 +189,7 @@ final class GridAdapter extends BaseAdapter {
     }
 
     @Override
-    public String getItem(int position) {
+    public Image getItem(int position) {
         return images.get(position);
     }
 
@@ -206,7 +206,7 @@ final class GridAdapter extends BaseAdapter {
             view.setScaleType(CENTER_CROP);
         }
 
-        String url = getItem(position);
+        String url = getItem(position).getDireccio();
         Picasso.with(context)
                 .load(url)
                 .placeholder(R.drawable.placeholder)
@@ -214,8 +214,6 @@ final class GridAdapter extends BaseAdapter {
                 .fit()
                 .tag(context)
                 .into(view);
-
-        //view.setOnClickListener(v -> activity.showDetails(url));
 
         return view;
     }
