@@ -55,14 +55,13 @@ public class PhotoListActivity extends PicassoActivity {
         }*/
     }
 
-    void showDetails(String url) {
+    void showDetails(Image image) {
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.gallery_content, DetailFragment.newInstance(url))
+                .add(R.id.gallery_content, DetailFragment.newInstance(image))
                 .addToBackStack(null)
                 .commit();
     }
 
-    // uid = pocholo
     public void listImages(String uid) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images");
@@ -126,8 +125,8 @@ public class PhotoListActivity extends PicassoActivity {
             gridView.setAdapter(adapter);
             gridView.setOnScrollListener(new ScrollListener(activity));
             gridView.setOnItemClickListener((adapterView, view, position, id) -> {
-                String url = adapter.getItem(position).getDireccio();
-                activity.showDetails(url);
+                Image image = adapter.getItem(position);
+                activity.showDetails(image);
             });
             return gridView;
         }
@@ -136,9 +135,9 @@ public class PhotoListActivity extends PicassoActivity {
     public static class DetailFragment extends Fragment {
         private static final String KEY_URL = "picasso:url";
 
-        public static DetailFragment newInstance(String url) {
+        public static DetailFragment newInstance(Image image) {
             Bundle arguments = new Bundle();
-            arguments.putString(KEY_URL, url);
+            arguments.putString(KEY_URL, image.getDireccio());
 
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(arguments);
