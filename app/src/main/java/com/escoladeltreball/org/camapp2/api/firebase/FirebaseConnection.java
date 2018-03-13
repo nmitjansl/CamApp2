@@ -260,4 +260,52 @@ public class FirebaseConnection {
         return true;
     }
 
+    /**
+     * updatelike
+     */
+    public void updatelike(String uid, Image image){
+        //Copia desde aquí
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Image> userImages = new ArrayList<>();
+                DataSnapshot refUid = null;
+                String realUID = null;
+                try{
+                    realUID = dataSnapshot.child("users_images").child(uid).getKey();
+                    if(realUID == uid){
+                        refUid = dataSnapshot.child(uid);
+                    }
+                }catch(Exception e){
+                    refUid = null;
+                }
+                if(realUID == uid){
+                    for(DataSnapshot item : refUid.getChildren()){
+                        String direccio = item.child("direccio").getValue().toString();
+                        if(image.getDireccio().equals(direccio)){
+                            String code = item.getKey();
+                            DatabaseReference refImg = myRef.child(uid).child(code);
+                            HashMap newValues = new HashMap();
+                            String newLikes = String.valueOf(Integer.parseInt(image.getLikes()) + 1);
+                            newValues.put("direccio",image.getDireccio());
+                            newValues.put("likes", newLikes);
+                            newValues.put("uid",image.getUid());
+                            refImg.updateChildren(newValues);
+                            System.out.println(refImg.toString());
+                            break;
+                        }
+                    }
+                }
+                //Haz tu código aquí
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+    }
 }
