@@ -152,7 +152,8 @@ public class PhotoListActivity extends PicassoActivity {
 
             ImageView imageView = (ImageView) view.findViewById(R.id.photo);
             Button btn_like = (Button) view.findViewById(R.id.btn_like);
-            // TODO set like listener
+            // TODO set like textView and like liker
+
 
             Bundle arguments = getArguments();
             String url = arguments.getString(KEY_URL);
@@ -209,7 +210,6 @@ final class GridAdapter extends BaseAdapter {
         }
 
         String url = getItem(position).getDireccio();
-        Log.v("MYTAG","getView:"+url);
         Picasso.with(context)
                 .load(url)
                 .placeholder(R.drawable.placeholder)
@@ -260,19 +260,5 @@ class ScrollListener implements AbsListView.OnScrollListener {
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                          int totalItemCount) {
         // Do nothing.
-    }
-}
-
-final class Data {
-    static final String BASE = "http://i.imgur.com/";
-    static final String EXT = ".jpg";
-    static final String[] URLS = {
-            BASE + "bXSam7h" + EXT, BASE + "KRatyV5" + EXT, BASE + "9hPHF4V" + EXT,
-            BASE + "Gy4fExt" + EXT, BASE + "GIjuplT" + EXT, BASE + "GH4uFn5" + EXT,
-
-    };
-
-    private Data() {
-        // No instances.
     }
 }
