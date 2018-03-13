@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.escoladeltreball.org.camapp2.models.Image;
 import com.escoladeltreball.org.camapp2.models.User;
@@ -134,10 +135,11 @@ public class PhotoListActivity extends PicassoActivity {
 
     public static class DetailFragment extends Fragment {
         private static final String KEY_URL = "picasso:url";
+        private static Image image;
 
         public static DetailFragment newInstance(Image image) {
             Bundle arguments = new Bundle();
-            arguments.putString(KEY_URL, image.getDireccio());
+            arguments.putSerializable(KEY_URL, image);
 
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(arguments);
@@ -150,16 +152,18 @@ public class PhotoListActivity extends PicassoActivity {
             View view = LayoutInflater.from(activity)
                     .inflate(R.layout.activity_photo_list_detail, container, false);
 
+            Bundle arguments = getArguments();
+            image = (Image) arguments.getSerializable(KEY_URL);
+
             ImageView imageView = (ImageView) view.findViewById(R.id.photo);
             Button btn_like = (Button) view.findViewById(R.id.btn_like);
+            TextView likes = (TextView) view.findViewById(R.id.likes);
+            likes.setText(image.getLikes());
             // TODO set like textView and like liker
 
 
-            Bundle arguments = getArguments();
-            String url = arguments.getString(KEY_URL);
-
             Picasso.with(getContext())
-                    .load(url)
+                    .load(image.getDireccio())
                     .placeholder(R.drawable.placeholder)
                     .error(R.drawable.error)
                     .fit()
