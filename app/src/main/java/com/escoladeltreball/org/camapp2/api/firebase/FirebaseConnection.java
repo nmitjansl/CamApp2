@@ -126,7 +126,7 @@ public class FirebaseConnection {
 
     public void insertUserImage(String nombre, String direccio) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images").child(String.valueOf(System.currentTimeMillis()));
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images").child(nombre).child(String.valueOf(System.currentTimeMillis()));
         Image image = new Image(userFire.getEmail(), direccio);
         myRef.setValue(image);
     }
