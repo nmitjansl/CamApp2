@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.escoladeltreball.org.camapp2.api.firebase.FirebaseConnection;
 import com.escoladeltreball.org.camapp2.models.User;
@@ -120,6 +121,8 @@ public class CameraLauncher extends AppCompatActivity {
 
 
 
+
+
             // LOG OUT
             FloatingActionButton fab1 = findViewById(R.id.logOutButton);
             fab1.setOnClickListener(view -> {
@@ -134,9 +137,10 @@ public class CameraLauncher extends AppCompatActivity {
             FloatingActionButton fab2 = findViewById(R.id.openCameraButton);
             fab2.setOnClickListener(view -> {
                 openCamera();
-                if(imgUri != null){
-                    firebaseConnection.upload(imgUri.toString()); // TODO pendiente a Luca lo diga
-                }
+//                if(imgUri != null){
+//                    firebaseConnection.upload(imgUri.toString()); // TODO pendiente a Luca lo diga
+//                }
+
             });
 
             Spinner spinner = findViewById(R.id.userList);
@@ -177,6 +181,17 @@ public class CameraLauncher extends AppCompatActivity {
                 startActivity(intent);
             });
         }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MY_REQUEST_CODE){
+            firebaseConnection.upload(imgUri.toString()); // TODO pendiente a Luca lo diga
+            Toast.makeText(this, "HOLAAAAA", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
