@@ -43,9 +43,6 @@ public class PhotoListActivity extends PicassoActivity {
         Intent intent = getIntent();
         User user = (User) intent.getSerializableExtra("USER");
 
-        // TODO remove fake user
-        user = new User("pocholo", "pocholo", "pocholo@gmail.com", "pocholo");
-
         listImages(user.getUid());
 
         /*if (savedInstanceState == null) {
