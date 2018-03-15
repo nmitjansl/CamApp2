@@ -1,10 +1,12 @@
 package com.escoladeltreball.org.camapp2.models;
 
+import java.io.Serializable;
+
 /**
  * Created by iam47662285 on 2/8/18.
  */
 
-public class Image {
+public class Image implements Serializable {
 
     private String email;
     private String direccio;

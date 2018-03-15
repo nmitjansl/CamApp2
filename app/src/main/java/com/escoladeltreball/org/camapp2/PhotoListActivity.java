@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,15 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.escoladeltreball.org.camapp2.models.Image;
 import com.escoladeltreball.org.camapp2.models.User;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -26,31 +34,77 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 public class PhotoListActivity extends PicassoActivity {
 
-    private ArrayList<String> urls;
+    private ArrayList<Image> urls = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        User user = (User) intent.getParcelableExtra("USER");
+        User user = (User) intent.getSerializableExtra("USER");
 
-        if (savedInstanceState == null) {
+        listImages(user.getUid());
+
+        /*if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.gallery_content, MasterFragment.newInstance())
                     .commit();
-        }
+            Log.v("MYTAG","Commit fragment");
+        }*/
     }
 
-    void showDetails(String url) {
-        //Toast.makeText(this, url, Toast.LENGTH_SHORT).show();
+    void showDetails(Image image) {
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.gallery_content, DetailFragment.newInstance(url))
+                .add(R.id.gallery_content, DetailFragment.newInstance(image))
                 .addToBackStack(null)
                 .commit();
     }
 
-    public ArrayList<String> getUrls() {
+    public void listImages(String uid) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<Image> userImages = new ArrayList<>();
+                DataSnapshot refUid = null;
+                String realUID = null;
+                try{
+                    realUID = dataSnapshot.child("users_images").child(uid).getKey();
+                    if(realUID == uid){
+                        refUid = dataSnapshot.child(uid);
+                    }
+                }catch(Exception e){
+                    refUid = null;
+                }
+                if(realUID == uid){
+                    for(DataSnapshot item : refUid.getChildren()){
+                        Object test = item.getValue();
+                        Image image = item.getValue(Image.class);
+                        if(image != null){
+                            userImages.add(image);
+                        }
+                    }
+                }
+
+                // clear urls and addAll
+                for (Image image : userImages) {
+                    urls.add(image);
+                }
+
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.gallery_content, MasterFragment.newInstance())
+                        .commit();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+    }
+
+    public ArrayList<Image> getUrls() {
         return urls;
     }
 
@@ -69,8 +123,8 @@ public class PhotoListActivity extends PicassoActivity {
             gridView.setAdapter(adapter);
             gridView.setOnScrollListener(new ScrollListener(activity));
             gridView.setOnItemClickListener((adapterView, view, position, id) -> {
-                String url = adapter.getItem(position);
-                activity.showDetails(url);
+                Image image = adapter.getItem(position);
+                activity.showDetails(image);
             });
             return gridView;
         }
@@ -78,10 +132,11 @@ public class PhotoListActivity extends PicassoActivity {
 
     public static class DetailFragment extends Fragment {
         private static final String KEY_URL = "picasso:url";
+        private static Image image;
 
-        public static DetailFragment newInstance(String url) {
+        public static DetailFragment newInstance(Image image) {
             Bundle arguments = new Bundle();
-            arguments.putString(KEY_URL, url);
+            arguments.putSerializable(KEY_URL, image);
 
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(arguments);
@@ -93,17 +148,19 @@ public class PhotoListActivity extends PicassoActivity {
             Activity activity = getActivity();
             View view = LayoutInflater.from(activity)
                     .inflate(R.layout.activity_photo_list_detail, container, false);
-            
+
+            Bundle arguments = getArguments();
+            image = (Image) arguments.getSerializable(KEY_URL);
 
             ImageView imageView = (ImageView) view.findViewById(R.id.photo);
             Button btn_like = (Button) view.findViewById(R.id.btn_like);
-            // TODO set listener
+            TextView likes = (TextView) view.findViewById(R.id.likes);
+            likes.setText(image.getLikes());
+            // TODO set like textView and like liker
 
-            Bundle arguments = getArguments();
-            String url = arguments.getString(KEY_URL);
 
             Picasso.with(getContext())
-                    .load(url)
+                    .load(image.getDireccio())
                     .placeholder(R.drawable.placeholder)
                     .error(R.drawable.error)
                     .fit()
@@ -118,21 +175,16 @@ public class PhotoListActivity extends PicassoActivity {
 final class GridAdapter extends BaseAdapter {
     private final Context context;
     private final PhotoListActivity activity;
-    private final List<String> images = new ArrayList<>();
+    private final List<Image> images = new ArrayList<>();
 
     public GridAdapter(Context context) {
         this.context = context;
         activity = (PhotoListActivity) context;
 
-        // Ensure we get a different ordering of images on each run.
-        //Collections.copy(images, activity.getUrls());
-        Collections.addAll(images, Data.URLS);
-        Collections.shuffle(images);
+        for (Image image : activity.getUrls()) {
+            images.add(image);
+        }
 
-        // Triple up the list.
-        ArrayList<String> copy = new ArrayList<>(images);
-        images.addAll(copy);
-        images.addAll(copy);
     }
 
     @Override
@@ -141,7 +193,7 @@ final class GridAdapter extends BaseAdapter {
     }
 
     @Override
-    public String getItem(int position) {
+    public Image getItem(int position) {
         return images.get(position);
     }
 
@@ -158,7 +210,7 @@ final class GridAdapter extends BaseAdapter {
             view.setScaleType(CENTER_CROP);
         }
 
-        String url = getItem(position);
+        String url = getItem(position).getDireccio();
         Picasso.with(context)
                 .load(url)
                 .placeholder(R.drawable.placeholder)
@@ -166,8 +218,6 @@ final class GridAdapter extends BaseAdapter {
                 .fit()
                 .tag(context)
                 .into(view);
-
-        //view.setOnClickListener(v -> activity.showDetails(url));
 
         return view;
     }
@@ -211,19 +261,5 @@ class ScrollListener implements AbsListView.OnScrollListener {
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                          int totalItemCount) {
         // Do nothing.
-    }
-}
-
-final class Data {
-    static final String BASE = "http://i.imgur.com/";
-    static final String EXT = ".jpg";
-    static final String[] URLS = {
-            BASE + "bXSam7h" + EXT, BASE + "KRatyV5" + EXT, BASE + "9hPHF4V" + EXT,
-            BASE + "Gy4fExt" + EXT, BASE + "GIjuplT" + EXT, BASE + "GH4uFn5" + EXT,
-
-    };
-
-    private Data() {
-        // No instances.
     }
 }
