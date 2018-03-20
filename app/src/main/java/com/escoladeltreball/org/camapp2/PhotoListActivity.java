@@ -43,7 +43,7 @@ public class PhotoListActivity extends PicassoActivity {
         Intent intent = getIntent();
         User user = (User) intent.getSerializableExtra("USER");
 
-        listImages(user.getUid());
+        listImages("pocholo");
 
         /*if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
