@@ -65,6 +65,12 @@ public class CameraLauncher extends AppCompatActivity {
     private static boolean started;
     private static ArrayList<User> userArrayList = new ArrayList<>();
 
+    private File galleryFile;
+
+    public File getGalleryFile() {
+        return galleryFile;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,7 +189,8 @@ public class CameraLauncher extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MY_REQUEST_CODE){
-            firebaseConnection.upload(imgUri.toString()); // TODO pendiente a Luca lo diga
+//            String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + imgUri.toString();
+            firebaseConnection.upload(imgUri.getPath()); // TODO pendiente a Luca lo diga
             Toast.makeText(this, "HOLAAAAA", Toast.LENGTH_SHORT).show();
         }
 
@@ -317,7 +324,7 @@ public class CameraLauncher extends AppCompatActivity {
     private Uri getImageUri() {
 
 
-        File galleryFile = new File(Environment.getExternalStoragePublicDirectory(
+        galleryFile = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES) + GALLERY);
         if (!galleryFile.exists()) {
             galleryFile.mkdirs();
@@ -331,6 +338,7 @@ public class CameraLauncher extends AppCompatActivity {
 
         return uri;
     }
+
 
     /* PRIVATE API */
     private boolean checkPermission(int requestCode) {
@@ -404,4 +412,6 @@ public class CameraLauncher extends AppCompatActivity {
             imageView.setImageBitmap(result);
         }
     }
+
+
 }
