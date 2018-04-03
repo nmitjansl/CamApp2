@@ -61,6 +61,7 @@ public class FirebaseConnection {
 
 
     public FirebaseConnection() {
+        this.storageRef = FirebaseStorage.getInstance().getReference();
     }
 
     public FirebaseConnection(String user, StorageReference storageRef) {
@@ -125,10 +126,10 @@ public class FirebaseConnection {
         return user;
     }
 
-    public void insertUserImage(String nombre, String direccio) {
+    public void insertUserImage(String nombre, String direccio, User user) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images").child(nombre);
-        Image image = new Image(userFire.getEmail(), direccio);
+        Image image = new Image(user.getEmail(), direccio);
         myRef.setValue(image);
     }
 
@@ -193,14 +194,14 @@ public class FirebaseConnection {
 
 
 
-    public void upload(String path) {
+    public void upload(String path, User user) {
         //copia metodo
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + path);
 
         if (file.exists()) {
 
             String name = file.getName();
-            StorageReference imgRef = storageRef.child(userFire.getEmail()).child(name);
+            StorageReference imgRef = storageRef.child(user.getEmail()).child(name);
             InputStream stream = null;
 
             try {
@@ -213,7 +214,7 @@ public class FirebaseConnection {
                     .addOnSuccessListener(taskSnapshot -> {
                         // Get a URL to the uploaded content
                         Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                        insertUserImage(userFire.getUid(), String.valueOf(taskSnapshot.getDownloadUrl()));
+                        insertUserImage(user.getUid(), String.valueOf(taskSnapshot.getDownloadUrl()), user);
                         //pon aqui tu codigo
                     })
                     .addOnFailureListener(exception -> {
