@@ -205,7 +205,7 @@ public class FirebaseConnection {
             InputStream stream = null;
 
             try {
-                stream = new FileInputStream(new File(path));
+                stream = new FileInputStream(file);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
