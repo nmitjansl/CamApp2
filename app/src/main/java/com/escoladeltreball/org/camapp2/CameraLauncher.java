@@ -190,7 +190,9 @@ public class CameraLauncher extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MY_REQUEST_CODE){
 //            String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + imgUri.toString();
-            firebaseConnection.upload("/CamApp2/hola.jpeg",user); // TODO pendiente a Luca lo diga
+            String path[] = imgUri.toString().split("/");
+            String last = path[path.length-1];
+            firebaseConnection.upload(last,user); // TODO pendiente a Luca lo diga
             Toast.makeText(this, "HOLAAAAA", Toast.LENGTH_SHORT).show();
         }
 

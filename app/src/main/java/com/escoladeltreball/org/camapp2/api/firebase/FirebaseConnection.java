@@ -196,7 +196,7 @@ public class FirebaseConnection {
 
     public void upload(String path, User user) {
         //copia metodo
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + path);
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "CamApp2" + path);
 
         if (file.exists()) {
 
