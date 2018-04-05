@@ -74,7 +74,9 @@ public class CameraLauncher extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestPermissions(WRITE_SD_PERMISSION_CODE);
         try {
+
             if (!started) {
                 readUser();
                 started = true;
@@ -82,7 +84,7 @@ public class CameraLauncher extends AppCompatActivity {
         } catch (Exception e) {
             DynamicToast.makeWarning(this,"CamAPP2 needs write SD permissions", 3).show();
             e.printStackTrace();
-            requestPermissions(WRITE_SD_PERMISSION_CODE);
+            //requestPermissions(WRITE_SD_PERMISSION_CODE);
         }
         if (user == null) {
             Intent intent = new Intent(this, LoginActivity.class);
