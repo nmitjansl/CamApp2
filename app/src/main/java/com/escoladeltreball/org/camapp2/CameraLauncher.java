@@ -347,25 +347,28 @@ public class CameraLauncher extends AppCompatActivity {
     /* PRIVATE API */
     private boolean checkPermission(int requestCode) {
         DynamicToast.makeWarning(this, "Check permissions...").show();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            switch (requestCode) {
-                case 10: {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
-                        return false;
-                    }
+
+        switch (requestCode) {
+            case 10: {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
                 }
-                case 20: {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-                        return false;
-                    }
+            }
+            case 20: {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
                 }
-                case 30: {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        return false;
-                    }
+            }
+            case 30: {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
                 }
             }
         }
+        /*
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+        }*/
         DynamicToast.makeWarning(this, "Your device is not compatible...").show();
         return true;
     }
