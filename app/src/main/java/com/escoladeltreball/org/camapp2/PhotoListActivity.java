@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.escoladeltreball.org.camapp2.models.Image;
 import com.escoladeltreball.org.camapp2.models.User;
@@ -28,6 +29,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
@@ -35,6 +37,7 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 public class PhotoListActivity extends PicassoActivity {
 
     private ArrayList<Image> urls = new ArrayList<>();
+    private String currentUID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,8 @@ public class PhotoListActivity extends PicassoActivity {
 
         Intent intent = getIntent();
         User user = (User) intent.getSerializableExtra("USER");
-
+//        currentUID = user.getUid();
+        currentUID = "pocholo";
         listImages("pocholo");
 
         /*if (savedInstanceState == null) {
@@ -126,6 +130,8 @@ public class PhotoListActivity extends PicassoActivity {
                 Image image = adapter.getItem(position);
                 activity.showDetails(image);
             });
+
+            Toast.makeText(activity, "CUIDAO Sres., q s'executa el grid ppal", Toast.LENGTH_SHORT).show();
             return gridView;
         }
     }
@@ -133,6 +139,9 @@ public class PhotoListActivity extends PicassoActivity {
     public static class DetailFragment extends Fragment {
         private static final String KEY_URL = "picasso:url";
         private static Image image;
+
+        private int numLikes;
+        private TextView likes;
 
         public static DetailFragment newInstance(Image image) {
             Bundle arguments = new Bundle();
@@ -149,15 +158,17 @@ public class PhotoListActivity extends PicassoActivity {
             View view = LayoutInflater.from(activity)
                     .inflate(R.layout.activity_photo_list_detail, container, false);
 
+            PhotoListActivity pActivity = (PhotoListActivity) getActivity();
+
             Bundle arguments = getArguments();
             image = (Image) arguments.getSerializable(KEY_URL);
 
             ImageView imageView = (ImageView) view.findViewById(R.id.photo);
             Button btn_like = (Button) view.findViewById(R.id.btn_like);
-            TextView likes = (TextView) view.findViewById(R.id.likes);
+            likes = (TextView) view.findViewById(R.id.likes);
             likes.setText(image.getLikes());
-            // TODO set like textView and like liker
 
+            numLikes = Integer.parseInt(image.getLikes());
 
             Picasso.with(getContext())
                     .load(image.getDireccio())
@@ -167,8 +178,70 @@ public class PhotoListActivity extends PicassoActivity {
                     .tag(activity)
                     .into(imageView);
 
+
+            // TODO set like textView and like liker
+            btn_like.setOnClickListener(v -> updatelike(pActivity.currentUID, image) );
+
+
+
             return view;
         }
+
+
+
+        public void updatelike(String uid, Image image){
+            //Copia desde aquí
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference().child("users" + "/" + "users_images");
+            myRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    List<Image> userImages = new ArrayList<>();
+                    DataSnapshot refUid = null;
+                    String realUID = null;
+                    try{
+                        realUID = dataSnapshot.child("users_images").child(uid).getKey();
+                        if(realUID == uid){
+                            refUid = dataSnapshot.child(uid);
+                        }
+                    }catch(Exception e){
+                        refUid = null;
+                    }
+                    if(realUID == uid){
+                        for(DataSnapshot item : refUid.getChildren()){
+                            String direccio = item.child("direccio").getValue().toString();
+                            if(image.getDireccio().equals(direccio)){
+                                String code = item.getKey();
+                                DatabaseReference refImg = myRef.child(uid).child(code);
+                                HashMap newValues = new HashMap();
+                                String newLikes = String.valueOf(Integer.parseInt(image.getLikes()) + 1);
+                                newValues.put("direccio",image.getDireccio());
+                                newValues.put("likes", newLikes);
+                                newValues.put("uid",image.getUid());
+                                refImg.updateChildren(newValues);
+                                //System.out.println(refImg.toString());
+                                break;
+                            }
+                        }
+                    }
+                    //Haz tu código aquí
+
+                    // I actualitzem el valor mostrat en pantalla:
+                    likes.setText(Integer.toString((numLikes+1)));
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    System.out.println("The read failed: " + databaseError.getCode());
+                }
+            });
+
+
+
+        }
+
+
     }
 }
 
